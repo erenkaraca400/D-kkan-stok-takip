@@ -1,66 +1,43 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Giriş Yap</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <div class="container">
         <header class="header">
-            <h1 data-i18n="nav.login">🔐 Giriş Yap</h1>
-            <p class="subtitle" data-i18n="login.subtitle">Hesabınıza giriş yapın</p>
+            <h1>🔐 Giriş Yap</h1>
+            <p class="subtitle">Hesabınıza giriş yapın</p>
+        </header>
 
         <main class="main-content">
             <section class="form-section">
                 <form id="loginForm">
                     <div class="form-group">
-                        <label>Kullanıcı Adı:</label>
+                        <label>Kullanıcı Adı</label>
                         <input type="text" id="liUsername" required>
                     </div>
+
                     <div class="form-group">
-                        <label>Şifre:</label>
+                        <label>Şifre</label>
                         <input type="password" id="liPassword" required>
                     </div>
+
                     <div class="form-group">
-                        <label><input type="checkbox" id="liRemember"> Beni Hatırla (30 gün)</label>
+                        <label><input type="checkbox" id="liRemember"> Beni Hatırla</label>
                     </div>
-                    <button type="submit" class="btn btn-add" data-i18n="nav.login">Giriş Yap</button>
+
+                    <button class="btn btn-add">Giriş Yap</button>
                 </form>
-                <p style="margin-top:12px;"><a href="signup.html" class="btn btn-clear" data-i18n="login.createAccount">Hesap Oluştur</a></p>
             </section>
         </main>
     </div>
 
-    <script>
-        async function hashPasswordLocal(p) {
-            const enc = new TextEncoder();
-            const data = enc.encode(p);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-            return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
-        document.getElementById('loginForm').addEventListener('submit', async function(e){
-            e.preventDefault();
-            const username = document.getElementById('liUsername').value.trim();
-            const password = document.getElementById('liPassword').value;
-            const remember = document.getElementById('liRemember').checked;
-            if (!username || !password) return showAlert(translate('alert.fillRequired'));
-
-            const users = JSON.parse(localStorage.getItem('dukkan_users') || '[]');
-            const pwHash = await hashPasswordLocal(password);
-            const u = users.find(x => x.username === username && x.passwordHash === pwHash);
-            if (!u) return showAlert(translate('auth.invalidCredentials'));
-
-            localStorage.setItem('dukkan_current_user', username);
-            if (remember) {
-                const expiry = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
-                localStorage.setItem('dukkan_session', JSON.stringify({ user: username, expires: expiry }));
-            }
-            showSuccess(translate('auth.loginSuccess').replace('{{user}}', (u.displayName || username)));
-            window.location.href = 'index.html';
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
+
 </html>

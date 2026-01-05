@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="tr">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,147 +9,146 @@
 </head>
 
 <body>
-    <div class="container">
-        <header class="header">
-            <div class="header-inner">
-                <div>
-                    <h1 data-i18n="header.title">🏪 Dükkan Mal Takip Sistemi</h1>
-                    <p class="subtitle" data-i18n="subtitle">Envanterinizi Kolayca Yönetin</p>
-                </div>
-            </div>
-        </header>
+<div class="container">
 
-        <section class="subscription-bar">
-            <div class="sub-inner">
-                <span id="subscriptionInfo" data-i18n="subscription.info">Abonelik: <strong id="currentPackage">Ücretsiz</strong> | Haftalık Kalan: <strong id="weeklyRemaining">100</strong></span>
-                <select id="langSelect" aria-label="Dil seçimi" style="margin-left:12px; padding:8px; border-radius:8px; border:1px solid var(--border-color)">
-                    <option value="tr">Türkçe</option>
-                    <option value="en">English</option>
-                    <option value="es">Español</option>
-                    <option value="fr">Français</option>
-                    <option value="de">Deutsch</option>
-                    <option value="it">Italiano</option>
-                    <option value="pt">Português</option>
-                    <option value="nl">Nederlands</option>
-                    <option value="pl">Polski</option>
-                    <option value="sv">Svenska</option>
-                    <option value="id">Bahasa Indonesia</option>
-                </select>
-                <div class="auth-actions" style="margin-left:auto; display:flex; gap:8px; align-items:center;">
-                    <span id="userStatus"></span>
-                    <a id="loginLink" href="login.html" class="btn btn-clear" data-i18n="nav.login">Giriş Yap</a>
-                    <a id="signupLink" href="signup.html" class="btn btn-add" data-i18n="nav.signup">Katıl</a>
-                    <button id="logoutBtn" class="btn btn-clear" style="display:none" data-i18n="nav.logout">Çıkış</button>
-                    <a id="manageSubscription" href="subscription.html" class="btn btn-clear" data-i18n="nav.subs">Abonelikler</a>
-                </div>
-            </div>
-        </section>
-
-        <main class="main-content">
-            <section class="form-section">
-                <h2 data-i18n="form.newProduct">Yeni Ürün Ekle</h2>
-                <form id="productForm" class="form">
-                    <div class="form-group">
-                        <label for="productName" data-i18n="label.productName">Ürün Adı:</label>
-                        <input type="text" id="productName" placeholder="Ürün adını girin" data-i18n-placeholder="placeholder.productName" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="productCategory" data-i18n="label.category">Kategori:</label>
-                        <select id="productCategory" required>
-                            <option value="">Kategori Seçin</option>
-                            <option value="Tütün">Tütün ve Tütün Ürünleri</option>
-                            <option value="Hediyelik">Hediyelik Eşya</option>
-                            <option value="Elektronik">Elektronik</option>
-                            <option value="Giyim">Giyim</option>
-                            <option value="Yiyecek">Yiyecek</option>
-                            <option value="İçecek">İçecek</option>
-                            <option value="Temizlik">Temizlik Ürünleri</option>
-                            <option value="Mutfak">Mutfak Gereçleri</option>
-                            <option value="Kırtasiye">Kırtasiye</option>
-                            <option value="Ev Eşyası">Ev Eşyası</option>
-                            <option value="Kozmetik">Kozmetik</option>
-                            <option value="Kitap">Kitap</option>
-                            <option value="Diğer">Diğer</option>
-                        </select>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="productQuantity" data-i18n="label.quantity">Miktar:</label>
-                            <input type="number" id="productQuantity" placeholder="0" data-i18n-placeholder="placeholder.quantity" min="1" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="productPrice" data-i18n="label.price">Fiyat (₺):</label>
-                            <input type="number" id="productPrice" placeholder="0.00" data-i18n-placeholder="placeholder.price" step="0.01" min="0" required>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="productDescription" data-i18n="label.description">Açıklama:</label>
-                        <textarea id="productDescription" placeholder="Ürün açıklaması (opsiyonel)" data-i18n-placeholder="placeholder.description" rows="3"></textarea>
-                    </div>
-
-                    <button type="submit" class="btn btn-add" data-i18n="btn.add">➕ Ürün Ekle</button>
-                </form>
-            </section>
-
-            <section class="search-section">
-                <h2 data-i18n="products.title">Ürünler</h2>
-                <div class="search-container">
-                    <input type="text" id="searchInput" placeholder="Ürün ara..." class="search-input" data-i18n-placeholder="search.placeholder">
-                    <select id="filterCategory" class="filter-select">
-                        <option value="">Tüm Kategoriler</option>
-                        <option value="Tütün">Tütün ve Tütün Ürünleri</option>
-                        <option value="Hediyelik">Hediyelik Eşya</option>
-                        <option value="Elektronik">Elektronik</option>
-                        <option value="Giyim">Giyim</option>
-                        <option value="Yiyecek">Yiyecek</option>
-                        <option value="İçecek">İçecek</option>
-                        <option value="Temizlik">Temizlik Ürünleri</option>
-                        <option value="Mutfak">Mutfak Gereçleri</option>
-                        <option value="Kırtasiye">Kırtasiye</option>
-                        <option value="Ev Eşyası">Ev Eşyası</option>
-                        <option value="Kozmetik">Kozmetik</option>
-                        <option value="Kitap">Kitap</option>
-                        <option value="Diğer">Diğer</option>
-                    </select>
-                    <button id="deleteAllBtn" class="btn btn-danger" data-i18n="btn.deleteAll">🧹 Hepsini Sil</button>
-                    <button id="clearBtn" class="btn btn-clear" data-i18n="btn.clear">🗑️ Temizle</button>
-                </div>
-            </section>
-
-            <section class="products-section">
-                <div id="productsList" class="products-grid">
-                    <p class="empty-message" data-i18n="empty.message">Henüz ürün eklenmemiş. İlk ürünü ekleyerek başlayın!</p>
-                </div>
-            </section>
-
-            <section class="stats-section">
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <h3 data-i18n="stats.totalProducts">Toplam Ürün</h3>
-                        <p id="totalProducts" class="stat-value">0</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3 data-i18n="stats.totalStock">Toplam Stok</h3>
-                        <p id="totalStock" class="stat-value">0</p>
-                    </div>
-                    <div class="stat-card">
-                        <h3 data-i18n="stats.totalValue">Toplam Değer</h3>
-                        <p id="totalValue" class="stat-value">₺0.00</p>
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <footer class="footer">
-            <p>&copy; 2026 Dükkan Mal Takip Sistemi</p>
-            <p>&copy; Müşteri Hizmetleri Numaramız: 0505 856 19 76</p>
-        </footer>
+<header class="header">
+    <div class="header-inner">
+        <div>
+            <h1>🏪 Dükkan Mal Takip Sistemi</h1>
+            <p class="subtitle">Envanterinizi Kolayca Yönetin</p>
+        </div>
     </div>
+</header>
 
-    <script src="script.js"></script>
+<section class="subscription-bar">
+    <div class="sub-inner">
+        <span>
+            Abonelik:
+            <strong id="currentPackage">Ücretsiz</strong> |
+            Haftalık Kalan:
+            <strong id="weeklyRemaining">100</strong>
+        </span>
+
+        <div class="auth-actions" style="margin-left:auto; display:flex; gap:8px;">
+            <a href="login.html" class="btn btn-clear">Giriş Yap</a>
+            <a href="signup.html" class="btn btn-add">Katıl</a>
+            <a href="subscription.html" class="btn btn-clear">Abonelikler</a>
+        </div>
+    </div>
+</section>
+
+<main class="main-content">
+
+<section class="form-section">
+    <h2>Yeni Ürün Ekle</h2>
+
+    <form id="productForm" class="form">
+        <div class="form-group">
+            <label>Ürün Adı</label>
+            <input type="text" id="productName" placeholder="Ürün adını girin" required>
+        </div>
+
+        <div class="form-group">
+            <label>Kategori</label>
+            <select id="productCategory" required>
+                <option value="">Kategori Seçin</option>
+                <option>Tütün</option>
+                <option>Hediyelik</option>
+                <option>Elektronik</option>
+                <option>Giyim</option>
+                <option>Yiyecek</option>
+                <option>İçecek</option>
+                <option>Temizlik</option>
+                <option>Mutfak</option>
+                <option>Kırtasiye</option>
+                <option>Ev Eşyası</option>
+                <option>Kozmetik</option>
+                <option>Kitap</option>
+                <option>Diğer</option>
+            </select>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Miktar</label>
+                <input type="number" id="productQuantity" min="1" required>
+            </div>
+            <div class="form-group">
+                <label>Fiyat (₺)</label>
+                <input type="number" id="productPrice" step="0.01" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Açıklama</label>
+            <textarea id="productDescription" rows="3"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-add">➕ Ürün Ekle</button>
+    </form>
+</section>
+
+<section class="search-section">
+    <h2>Ürünler</h2>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Ürün ara..." class="search-input">
+        <select id="filterCategory" class="filter-select">
+            <option value="">Tüm Kategoriler</option>
+            <option>Tütün</option>
+            <option>Hediyelik</option>
+            <option>Elektronik</option>
+            <option>Giyim</option>
+            <option>Yiyecek</option>
+            <option>İçecek</option>
+            <option>Temizlik</option>
+            <option>Mutfak</option>
+            <option>Kırtasiye</option>
+            <option>Ev Eşyası</option>
+            <option>Kozmetik</option>
+            <option>Kitap</option>
+            <option>Diğer</option>
+        </select>
+
+        <button id="deleteAllBtn" class="btn btn-danger">🧹 Hepsini Sil</button>
+        <button id="clearBtn" class="btn btn-clear">🗑️ Temizle</button>
+    </div>
+</section>
+
+<section class="products-section">
+    <div id="productsList" class="products-grid">
+        <p class="empty-message">
+            Henüz ürün eklenmemiş. İlk ürünü ekleyerek başlayın!
+        </p>
+    </div>
+</section>
+
+<section class="stats-section">
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Toplam Ürün</h3>
+            <p id="totalProducts">0</p>
+        </div>
+        <div class="stat-card">
+            <h3>Toplam Stok</h3>
+            <p id="totalStock">0</p>
+        </div>
+        <div class="stat-card">
+            <h3>Toplam Değer</h3>
+            <p id="totalValue">₺0.00</p>
+        </div>
+    </div>
+</section>
+
+</main>
+
+<footer class="footer">
+    <p>© 2026 Dükkan Mal Takip Sistemi</p>
+    <p>Müşteri Hizmetleri: 0505 856 19 76</p>
+</footer>
+
+</div>
+
+<script src="script.js"></script>
 </body>
-
 </html>
