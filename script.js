@@ -105,7 +105,22 @@ document.addEventListener('DOMContentLoaded', function () {
     filterCategory.addEventListener('change', filterProducts);
     clearBtn.addEventListener('click', clearFilters);
 
+    // Hepsini sil butonu
+    const deleteAllBtn = document.getElementById('deleteAllBtn');
+    if (deleteAllBtn) deleteAllBtn.addEventListener('click', deleteAllProducts);
+
 });
+
+function deleteAllProducts() {
+    if (!products.length) return showAlert('Silinecek ürün yok.');
+    const confirmed = confirm('Tüm ürünleri silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.');
+    if (!confirmed) return;
+    products = [];
+    saveProducts();
+    renderProducts();
+    updateStats();
+    showSuccess('Tüm ürünler başarıyla silindi.');
+}
 
 
 

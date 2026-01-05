@@ -158,6 +158,15 @@ body {
     color: #fff;
 }
 
+.btn-danger {
+    background: #e74c3c;
+    color: #fff;
+}
+
+.btn-danger:hover {
+    filter: brightness(0.95);
+} 
+
 /* Products grid */
 .products-grid {
     display: grid;
