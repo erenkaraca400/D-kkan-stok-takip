@@ -36,7 +36,14 @@
     </div>
 
     <script>
-        document.getElementById('signupForm').addEventListener('submit', function(e){
+        async function hashPasswordLocal(p) {
+            const enc = new TextEncoder();
+            const data = enc.encode(p);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        document.getElementById('signupForm').addEventListener('submit', async function(e){
             e.preventDefault();
             const username = document.getElementById('suUsername').value.trim();
             const password = document.getElementById('suPassword').value;
@@ -48,7 +55,8 @@
             const users = JSON.parse(localStorage.getItem(usersKey) || '[]');
             if (users.find(u => u.username === username)) return alert('Bu kullanıcı adı zaten alınmış. Başka bir isim seçin.');
 
-            users.push({ username: username, password: password, displayName: display });
+            const pwHash = await hashPasswordLocal(password);
+            users.push({ username: username, passwordHash: pwHash, displayName: display });
             localStorage.setItem(usersKey, JSON.stringify(users));
 
             // set current user and initialize package + weekly + products for user

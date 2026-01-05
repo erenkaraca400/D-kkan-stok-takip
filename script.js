@@ -36,6 +36,30 @@ function saveUsers(list) {
     localStorage.setItem(USERS_KEY, JSON.stringify(list));
 }
 
+// Password hashing (SHA-256) helper
+async function hashPassword(password) {
+    const enc = new TextEncoder();
+    const data = enc.encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Session check (remember-me)
+function checkSession() {
+    const s = localStorage.getItem('dukkan_session');
+    if (!s) return;
+    try {
+        const obj = JSON.parse(s);
+        if (obj && obj.user && obj.expires && Date.now() < obj.expires) {
+            setCurrentUser(obj.user);
+        } else {
+            localStorage.removeItem('dukkan_session');
+        }
+    } catch (e) {
+        localStorage.removeItem('dukkan_session');
+    }
+}
+
 function productsKeyFor(user) {
     return STORAGE_KEY + (user ? '_' + user : '');
 }
@@ -134,6 +158,9 @@ const totalValueEl = document.getElementById('totalValue');
 
 // Sayfa yüklendiğinde
 document.addEventListener('DOMContentLoaded', function () {
+    // Auto-login if a valid session exists
+    checkSession();
+
     loadProducts();
     loadPackage();
     loadWeekly();
@@ -156,6 +183,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) logoutBtn.addEventListener('click', function () {
         setCurrentUser(null);
+        // remove persistent session
+        localStorage.removeItem('dukkan_session');
         // reload per-user state (back to guest)
         loadProducts();
         loadPackage();
