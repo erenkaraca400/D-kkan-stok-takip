@@ -169,6 +169,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function deleteAllProducts() {
+    if (!isLoggedIn()) return showLoginPrompt('Tüm ürünleri silmek için lütfen giriş yapın veya kayıt olun.');
     if (!products.length) return showAlert('Silinecek ürün yok.');
     const confirmed = confirm('Tüm ürünleri silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.');
     if (!confirmed) return;
@@ -184,6 +185,8 @@ function deleteAllProducts() {
 // Ürün Ekleme
 function addProduct(e) {
     e.preventDefault();
+
+    if (!isLoggedIn()) return showLoginPrompt('Ürün eklemek için giriş yapmalısınız.');
 
     if (!productName.value || !productCategory.value || !productQuantity.value || !productPrice.value) {
         showAlert('Lütfen tüm zorunlu alanları doldurun!');
@@ -259,18 +262,24 @@ function renderProducts() {
                 </div>
             </div>
             
+            ${isLoggedIn() ? `
             <div class="product-actions">
                 <button class="btn btn-decrease" onclick="changeQuantity(${product.id}, -1)">➖ Azalt</button>
                 <button class="btn btn-increase" onclick="changeQuantity(${product.id}, 1)">➕ Arttır</button>
                 <button class="btn btn-edit" onclick="editProduct(${product.id})">✏️ Düzenle</button>
                 <button class="btn btn-delete" onclick="deleteProduct(${product.id})">🗑️ Sil</button>
-            </div>
+            </div>` : `
+            <div class="product-actions">
+                <a class="btn btn-clear" href="login.html">Giriş Yap</a>
+                <a class="btn btn-add" href="signup.html">Katıl</a>
+            </div>`}
         </div>
     `).join('');
 }
 
 // Miktar Değiştir
 function changeQuantity(productId, change) {
+    if (!isLoggedIn()) return showLoginPrompt('Miktarı değiştirmek için giriş yapın.');
     const product = products.find(p => p.id === productId);
     if (product) {
         product.quantity += change;
@@ -283,6 +292,7 @@ function changeQuantity(productId, change) {
 
 // Ürün Sil
 function deleteProduct(productId) {
+    if (!isLoggedIn()) return showLoginPrompt('Ürünü silmek için giriş yapın.');
     if (confirm('Bu ürünü silmek istediğinizden emin misiniz?')) {
         products = products.filter(p => p.id !== productId);
         saveProducts();
@@ -294,6 +304,7 @@ function deleteProduct(productId) {
 
 // Ürün Düzenle
 function editProduct(productId) {
+    if (!isLoggedIn()) return showLoginPrompt('Ürünü düzenlemek için giriş yapın.');
     const product = products.find(p => p.id === productId);
     if (product) {
         productName.value = product.name;
@@ -352,12 +363,17 @@ function filterProducts() {
                 </div>
             </div>
             
+            ${isLoggedIn() ? `
             <div class="product-actions">
                 <button class="btn btn-decrease" onclick="changeQuantity(${product.id}, -1)">➖ Azalt</button>
                 <button class="btn btn-increase" onclick="changeQuantity(${product.id}, 1)">➕ Arttır</button>
                 <button class="btn btn-edit" onclick="editProduct(${product.id})">✏️ Düzenle</button>
                 <button class="btn btn-delete" onclick="deleteProduct(${product.id})">🗑️ Sil</button>
-            </div>
+            </div>` : `
+            <div class="product-actions">
+                <a class="btn btn-clear" href="login.html">Giriş Yap</a>
+                <a class="btn btn-add" href="signup.html">Katıl</a>
+            </div>`}
         </div>
     `).join('');
 }
@@ -446,7 +462,29 @@ function showSubscriptionPrompt(message) {
     document.querySelector('.main-content').insertBefore(messageEl, document.querySelector('.form-section'));
 }
 
-// Auth UI
+// Auth helpers and UI
+function isLoggedIn() {
+    return !!getCurrentUser();
+}
+
+function showLoginPrompt(message) {
+    // reuse subscribe message container
+    const existing = document.querySelector('.subscribe-message');
+    if (existing) existing.remove();
+    const msg = message || 'Lütfen giriş yapın veya kayıt olun.';
+    const messageEl = document.createElement('div');
+    messageEl.className = 'subscribe-message';
+    messageEl.innerHTML = `
+        <div style="flex:1">${msg}</div>
+        <div style="display:flex; gap:8px;">
+            <a class="btn btn-add" href="login.html">Giriş Yap</a>
+            <a class="btn btn-clear" href="signup.html">Katıl</a>
+            <button class="btn btn-clear" onclick="this.closest('.subscribe-message').remove()">Çık</button>
+        </div>
+    `;
+    document.querySelector('.main-content').insertBefore(messageEl, document.querySelector('.form-section'));
+}
+
 function updateAuthUI() {
     const user = getCurrentUser();
     const userStatus = document.getElementById('userStatus');
@@ -454,16 +492,48 @@ function updateAuthUI() {
     const signupLink = document.getElementById('signupLink');
     const logoutBtn = document.getElementById('logoutBtn');
 
+    // subscription bar behaviour
+    const pkgSpan = document.querySelector('.subscription-bar .sub-inner span:nth-child(1)');
+    const remSpan = document.querySelector('.subscription-bar .sub-inner span:nth-child(2)');
+    const authActions = document.querySelector('.subscription-bar .sub-inner .auth-actions');
+
     if (user) {
         if (userStatus) userStatus.textContent = `Hoşgeldin, ${user}`;
         if (loginLink) loginLink.style.display = 'none';
         if (signupLink) signupLink.style.display = 'none';
         if (logoutBtn) logoutBtn.style.display = 'inline-block';
+        if (pkgSpan) pkgSpan.style.display = 'inline';
+        if (remSpan) remSpan.style.display = 'inline';
+        if (authActions) authActions.style.display = 'flex';
     } else {
         if (userStatus) userStatus.textContent = '';
         if (loginLink) loginLink.style.display = 'inline-block';
         if (signupLink) signupLink.style.display = 'inline-block';
         if (logoutBtn) logoutBtn.style.display = 'none';
+        if (pkgSpan) pkgSpan.style.display = 'none';
+        if (remSpan) remSpan.style.display = 'none';
+        if (authActions) authActions.style.display = 'flex';
+    }
+
+    // disable or enable product form for guests
+    const form = document.getElementById('productForm');
+    if (form) {
+        const inputs = form.querySelectorAll('input, select, textarea, button[type="submit"]');
+        if (!isLoggedIn()) {
+            inputs.forEach(i => i.disabled = true);
+            // show banner
+            if (!document.getElementById('formAuthBanner')) {
+                const banner = document.createElement('div');
+                banner.id = 'formAuthBanner';
+                banner.className = 'alert-message';
+                banner.innerHTML = 'Ürün eklemek için lütfen <a href="login.html">Giriş Yapın</a> veya <a href="signup.html">Katılın</a>.';
+                form.parentElement.insertBefore(banner, form);
+            }
+        } else {
+            inputs.forEach(i => i.disabled = false);
+            const banner = document.getElementById('formAuthBanner');
+            if (banner) banner.remove();
+        }
     }
 }
 
