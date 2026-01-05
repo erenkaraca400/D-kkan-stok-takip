@@ -3,78 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ödeme ve Kimlik Bilgileri</title>
+    <title>Ödeme ve Kimlik Onayı</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <header class="header">
-            <h1>🛡️ Güvenli Ödeme</h1>
-            <p class="subtitle">Aboneliğinizi tamamlamak için bilgileri doldurun</p>
+            <h1>💳 Ödeme ve Kayıt</h1>
+            <p class="subtitle" id="packageInfo">Seçilen Paket: Yükleniyor...</p>
         </header>
 
         <main class="main-content">
             <section class="form-section">
-                <h2 id="selectedPackageTitle">Seçilen Paket: </h2>
-                <form id="checkoutForm" class="form">
+                <form id="paymentForm">
                     <div class="form-group">
-                        <label for="fullName">Ad Soyad:</label>
-                        <input type="text" id="fullName" placeholder="TC Kimlik üzerindeki ad soyad" required>
+                        <label>Ad Soyad:</label>
+                        <input type="text" id="userName" placeholder="Kart üzerindeki isim" required>
                     </div>
-
                     <div class="form-group">
-                        <label for="tcNo">TC Kimlik No:</label>
-                        <input type="text" id="tcNo" maxlength="11" placeholder="11 haneli TC No" required>
+                        <label>TC Kimlik No:</label>
+                        <input type="text" maxlength="11" placeholder="11 haneli TC No" required>
                     </div>
-
                     <div class="form-group">
-                        <label for="cardNumber">Kart Numarası:</label>
-                        <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" required>
+                        <label>Kart Numarası:</label>
+                        <input type="text" placeholder="0000 0000 0000 0000" required>
                     </div>
-
                     <div class="form-row">
-                        <div class="form-group">
-                            <label>Son Kullanma:</label>
-                            <input type="text" placeholder="AA/YY" required>
-                        </div>
-                        <div class="form-group">
-                            <label>CVV:</label>
-                            <input type="password" placeholder="***" maxlength="3" required>
-                        </div>
+                        <div class="form-group"><label>SKT:</label><input type="text" placeholder="AA/YY" required></div>
+                        <div class="form-group"><label>CVV:</label><input type="password" placeholder="***" required></div>
                     </div>
-
-                    <button type="submit" class="btn btn-add" style="width: 100%; margin-top: 20px;">Ödemeyi Tamamla ve Abone Ol</button>
-                    <a href="subscription.html" class="btn btn-clear" style="display: block; text-align: center; margin-top: 10px;">Vazgeç</a>
+                    <button type="submit" class="btn btn-add" style="width:100%">Ödemeyi Yap ve Abone Ol</button>
                 </form>
             </section>
         </main>
     </div>
 
     <script>
-        // Sayfa yüklendiğinde hangi paketin seçildiğini URL'den alalım
-        const urlParams = new URLSearchParams(window.location.search);
-        const packageName = urlParams.get('name');
-        const packageLimit = urlParams.get('limit');
-        const packagePrice = urlParams.get('price');
+        // URL'den paket bilgilerini al
+        const params = new URLSearchParams(window.location.search);
+        const name = params.get('name');
+        const limit = params.get('limit');
+        const price = params.get('price');
 
-        document.getElementById('selectedPackageTitle').innerText += packageName + " (₺" + packagePrice + ")";
+        document.getElementById('packageInfo').textContent = `Seçilen Paket: ${name} (₺${price})`;
 
-        document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+        document.getElementById('paymentForm').onsubmit = function(e) {
             e.preventDefault();
             
-            // Verileri kaydet
-            const pkg = { 
-                name: packageName, 
-                limit: packageLimit === 'unlimited' ? 'unlimited' : parseInt(packageLimit), 
-                price: packagePrice, 
-                purchasedAt: Date.now() 
-            };
-            
+            // Aboneliği kaydet
+            const pkg = { name: name, limit: limit, price: price, purchasedAt: Date.now() };
             localStorage.setItem('dukkan_package', JSON.stringify(pkg));
             
-            alert("Ödeme Başarılı! Aboneliğiniz aktif edildi.");
+            alert("Ödeme onaylandı! Aboneliğiniz aktif edildi.");
             window.location.href = 'index.html';
-        });
+        };
     </script>
 </body>
 </html>
