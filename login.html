@@ -26,9 +26,9 @@
                     <div class="form-group">
                         <label><input type="checkbox" id="liRemember"> Beni Hatırla (30 gün)</label>
                     </div>
-                    <button type="submit" class="btn btn-add">Giriş Yap</button>
+                    <button type="submit" class="btn btn-add" data-i18n="nav.login">Giriş Yap</button>
                 </form>
-                <p style="margin-top:12px;"><a href="signup.html" class="btn btn-clear">Hesap Oluştur</a></p>
+                <p style="margin-top:12px;"><a href="signup.html" class="btn btn-clear" data-i18n="login.createAccount">Hesap Oluştur</a></p>
             </section>
         </main>
     </div>
@@ -46,19 +46,19 @@
             const username = document.getElementById('liUsername').value.trim();
             const password = document.getElementById('liPassword').value;
             const remember = document.getElementById('liRemember').checked;
-            if (!username || !password) return alert('Lütfen kullanıcı adı ve şifre girin.');
+            if (!username || !password) return showAlert(translate('alert.fillRequired'));
 
             const users = JSON.parse(localStorage.getItem('dukkan_users') || '[]');
             const pwHash = await hashPasswordLocal(password);
             const u = users.find(x => x.username === username && x.passwordHash === pwHash);
-            if (!u) return alert('Hatalı kullanıcı adı veya şifre.');
+            if (!u) return showAlert(translate('auth.invalidCredentials'));
 
             localStorage.setItem('dukkan_current_user', username);
             if (remember) {
                 const expiry = Date.now() + 30 * 24 * 60 * 60 * 1000; // 30 days
                 localStorage.setItem('dukkan_session', JSON.stringify({ user: username, expires: expiry }));
             }
-            alert('Giriş başarılı. Hoşgeldiniz, ' + (u.displayName || username));
+            showSuccess(translate('auth.loginSuccess').replace('{{user}}', (u.displayName || username)));
             window.location.href = 'index.html';
         });
     </script>

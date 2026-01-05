@@ -13,8 +13,8 @@
         <header class="header">
             <div class="header-inner">
                 <div>
-                    <h1>🏪 Abonelik Paketleri</h1>
-                    <p class="subtitle">Mevcut paketiniz ve yükseltme seçenekleri</p>
+                    <h1 data-i18n="subscription.title">🏪 Abonelik Paketleri</h1>
+                    <p class="subtitle" data-i18n="subscription.subtitle">Mevcut paketiniz ve yükseltme seçenekleri</p>
                 </div>
             </div>
         </header>
@@ -30,30 +30,30 @@
                 <h2>Paketler</h2>
                 <div class="package-grid">
                     <div class="package-card">
-                        <h3>Ücretsiz</h3>
-                        <p>Haftalık 100 ürün ekleme limiti</p>
-                        <p><strong>Fiyat: Ücretsiz</strong></p>
-                        <button class="btn btn-clear" disabled>Mevcut</button>
+                        <h3 data-i18n="package.free">Ücretsiz</h3>
+                        <p data-i18n="package.free.desc">Haftalık 100 ürün ekleme limiti</p>
+                        <p><strong data-i18n="package.free.price">Fiyat: Ücretsiz</strong></p>
+                        <button class="btn btn-clear" disabled data-i18n="package.current">Mevcut</button>
                     </div>
 
                     <div class="package-card">
-                        <h3>Basic</h3>
-                        <p>Haftalık 500 ürün</p>
+                        <h3 data-i18n="package.basic">Basic</h3>
+                        <p data-i18n="package.basic.desc">Haftalık 500 ürün</p>
                         <p><strong>₺29.99 / ay</strong></p>
-                        <button class="btn btn-add" onclick="buyPackage('Basic', 500, 29.99)">Satın Al</button>
+                        <button class="btn btn-add" onclick="buyPackage('Basic', 500, 29.99)" data-i18n="package.buy">Satın Al</button>
                     </div>
 
                     <div class="package-card">
-                        <h3>Pro</h3>
-                        <p>Sınırsız ürün</p>
+                        <h3 data-i18n="package.pro">Pro</h3>
+                        <p data-i18n="package.pro.desc">Sınırsız ürün</p>
                         <p><strong>₺79.99 / ay</strong></p>
-                        <button class="btn btn-add" onclick="buyPackage('Pro', 'unlimited', 79.99)">Satın Al</button>
+                        <button class="btn btn-add" onclick="buyPackage('Pro', 'unlimited', 79.99)" data-i18n="package.buy">Satın Al</button>
                     </div>
                 </div>
             </section>
 
             <section>
-                <a class="btn btn-clear" href="index.html">← Ana Sayfaya Dön</a>
+                <a class="btn btn-clear" href="index.html" data-i18n="nav.home">← Ana Sayfaya Dön</a>
             </section>
         </main>
 
@@ -69,11 +69,10 @@
             // require login: if not logged in, prompt to sign up / login first
             const currentUser = localStorage.getItem('dukkan_current_user');
             if (!currentUser) {
-                alert('Lütfen önce giriş yapın veya kayıt olun.');
+                localStorage.setItem('dukkan_temp_action', 'buy');
                 window.location.href = 'login.html';
                 return;
             }
-            // Yönlendir: ödeme formuna git (kullanıcının kart bilgilerini girmesi için)
             const url = `checkout.html?name=${encodeURIComponent(name)}&limit=${encodeURIComponent(limit)}&price=${encodeURIComponent(price)}`;
             window.location.href = url;
         }
@@ -84,17 +83,19 @@
             if (saved) {
                 try {
                     const pkg = JSON.parse(saved);
-                    el.textContent = pkg.name + (pkg.limit === 'unlimited' ? ' (Sınırsız)' : ' (' + pkg.limit + '/hafta)');
+                    const name = (pkg.name === 'Ücretsiz' || pkg.name === 'Free') ? (typeof translate === 'function' ? translate('package.free') : pkg.name) : pkg.name;
+                    el.textContent = name + (pkg.limit === 'unlimited' ? ' (' + (typeof translate === 'function' ? 'Sınırsız' : 'Sınırsız') + ')' : ' (' + pkg.limit + '/hafta)');
                 } catch (e) {
-                    el.textContent = 'Ücretsiz (100/hafta)';
+                    el.textContent = (typeof translate === 'function' ? translate('package.free') : 'Ücretsiz') + ' (100/hafta)';
                 }
             } else {
-                el.textContent = 'Ücretsiz (100/hafta)';
+                el.textContent = (typeof translate === 'function' ? translate('package.free') : 'Ücretsiz') + ' (100/hafta)';
             }
         }
 
         document.addEventListener('DOMContentLoaded', loadCurrent);
     </script>
+    <script src="script.js"></script>
 </body>
 
 </html>

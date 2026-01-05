@@ -32,7 +32,7 @@
                         <div class="form-group"><label>SKT:</label><input type="text" placeholder="AA/YY" required></div>
                         <div class="form-group"><label>CVV:</label><input type="password" placeholder="***" required></div>
                     </div>
-                    <button type="submit" class="btn btn-add" style="width:100%">Ödemeyi Yap ve Abone Ol</button>
+                    <button type="submit" class="btn btn-add" data-i18n="checkout.pay" style="width:100%">Ödemeyi Yap ve Abone Ol</button>
                 </form>
             </section>
         </main>
@@ -52,7 +52,7 @@
             
             // Basit form doğrulaması
             const userName = document.getElementById('userName').value.trim();
-            if (!userName) return alert('Lütfen ad soyad girin.');
+            if (!userName) return showAlert(translate('checkout.nameRequired'));
 
             // Aboneliği kaydet (kullanıcıya özel)
             const currentUser = localStorage.getItem('dukkan_current_user');
@@ -70,9 +70,10 @@
                 localStorage.setItem('dukkan_weekly_' + currentUser, JSON.stringify({ start: weekStart, count: 0 }));
             }
 
-            alert("Ödeme onaylandı! Aboneliğiniz aktif edildi.");
+            showSuccess(translate('checkout.success'));
             window.location.href = 'index.html';
         };
     </script>
+    <script src="script.js"></script>
 </body>
 </html>

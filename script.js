@@ -131,7 +131,11 @@ function getPackageLimit() {
 function updateSubscriptionUI() {
     const pkgEl = document.getElementById('currentPackage');
     const remEl = document.getElementById('weeklyRemaining');
-    if (pkgEl) pkgEl.textContent = userPackage ? userPackage.name : 'Ücretsiz';
+    if (pkgEl) {
+        const nameRaw = userPackage ? userPackage.name : 'Ücretsiz';
+        const name = (nameRaw === 'Ücretsiz' || nameRaw === 'Free') ? translate('package.free') : nameRaw;
+        pkgEl.textContent = name;
+    }
     const limit = getPackageLimit();
     if (remEl) {
         if (limit === Infinity) remEl.textContent = 'Sınırsız';
@@ -208,6 +212,7 @@ document.addEventListener('DOMContentLoaded', function () {
             localStorage.setItem('dukkan_lang', sel.value);
             translatePage();
             updateSubscriptionUI();
+            renderProducts();
         });
     }
 
@@ -240,15 +245,15 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function deleteAllProducts() {
-    if (!isLoggedIn()) return showLoginPrompt('Tüm ürünleri silmek için lütfen giriş yapın veya kayıt olun.');
-    if (!products.length) return showAlert('Silinecek ürün yok.');
-    const confirmed = confirm('Tüm ürünleri silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.');
+    if (!isLoggedIn()) return showLoginPrompt(translate('loginPrompt'));
+    if (!products.length) return showAlert(translate('noProductsToDelete'));
+    const confirmed = confirm(translate('confirm.deleteAll'));
     if (!confirmed) return;
     products = [];
     saveProducts();
     renderProducts();
     updateStats();
-    showSuccess('Tüm ürünler başarıyla silindi.');
+    showSuccess(translate('allDeleted'));
 }
 
 
@@ -257,16 +262,16 @@ function deleteAllProducts() {
 function addProduct(e) {
     e.preventDefault();
 
-    if (!isLoggedIn()) return showLoginPrompt('Ürün eklemek için giriş yapmalısınız.');
+    if (!isLoggedIn()) return showLoginPrompt(translate('needLoginAdd'));
 
     if (!productName.value || !productCategory.value || !productQuantity.value || !productPrice.value) {
-        showAlert('Lütfen tüm zorunlu alanları doldurun!');
+        showAlert(translate('alert.fillRequired'));
         return;
     }
 
     const limit = getPackageLimit();
     if (limit !== Infinity && weeklyData.count >= limit) {
-        showSubscriptionPrompt('Haftalık ürün ekleme limitinizi aştınız. Lütfen <a href="subscription.html">abonelik satın alın</a> veya mevcut paketi yükseltin.');
+        showSubscriptionPrompt(translate('limitExceeded'));
         return;
     }
 
@@ -295,7 +300,7 @@ function addProduct(e) {
     productForm.reset();
     productName.focus();
 
-    showSuccess('Ürün başarıyla eklendi! ✓');
+    showSuccess(translate('productAddedMessage'));
 }
 
 // Ürünleri Render Et
@@ -335,22 +340,24 @@ function renderProducts() {
             
             ${isLoggedIn() ? `
             <div class="product-actions">
-                <button class="btn btn-decrease" onclick="changeQuantity(${product.id}, -1)">➖ Azalt</button>
-                <button class="btn btn-increase" onclick="changeQuantity(${product.id}, 1)">➕ Arttır</button>
-                <button class="btn btn-edit" onclick="editProduct(${product.id})">✏️ Düzenle</button>
-                <button class="btn btn-delete" onclick="deleteProduct(${product.id})">🗑️ Sil</button>
+                <button class="btn btn-decrease" onclick="changeQuantity(${product.id}, -1)">➖ ${translate('btn.decrease')}</button>
+                <button class="btn btn-increase" onclick="changeQuantity(${product.id}, 1)">➕ ${translate('btn.increase')}</button>
+                <button class="btn btn-edit" onclick="editProduct(${product.id})">✏️ ${translate('btn.edit')}</button>
+                <button class="btn btn-delete" onclick="deleteProduct(${product.id})">🗑️ ${translate('btn.delete')}</button>
             </div>` : `
             <div class="product-actions">
-                <a class="btn btn-clear" href="login.html">Giriş Yap</a>
-                <a class="btn btn-add" href="signup.html">Katıl</a>
+                <a class="btn btn-clear" href="login.html">${translate('nav.login')}</a>
+                <a class="btn btn-clear" href="signup.html">${translate('nav.signup')}</a>
             </div>`}
         </div>
     `).join('');
+    // translate dynamic labels inside product cards
+    translateProductDetails();
 }
 
 // Miktar Değiştir
 function changeQuantity(productId, change) {
-    if (!isLoggedIn()) return showLoginPrompt('Miktarı değiştirmek için giriş yapın.');
+    if (!isLoggedIn()) return showLoginPrompt(translate('loginPrompt'));
     const product = products.find(p => p.id === productId);
     if (product) {
         product.quantity += change;
@@ -363,19 +370,19 @@ function changeQuantity(productId, change) {
 
 // Ürün Sil
 function deleteProduct(productId) {
-    if (!isLoggedIn()) return showLoginPrompt('Ürünü silmek için giriş yapın.');
-    if (confirm('Bu ürünü silmek istediğinizden emin misiniz?')) {
+    if (!isLoggedIn()) return showLoginPrompt(translate('loginPrompt'));
+    if (confirm(translate('confirm.delete'))) {
         products = products.filter(p => p.id !== productId);
         saveProducts();
         renderProducts();
         updateStats();
-        showSuccess('Ürün silindi ✓');
+        showSuccess(translate('productDeleted'));
     }
 }
 
 // Ürün Düzenle
 function editProduct(productId) {
-    if (!isLoggedIn()) return showLoginPrompt('Ürünü düzenlemek için giriş yapın.');
+    if (!isLoggedIn()) return showLoginPrompt(translate('loginPrompt'));
     const product = products.find(p => p.id === productId);
     if (product) {
         productName.value = product.name;
@@ -402,7 +409,7 @@ function filterProducts() {
     });
 
     if (filtered.length === 0) {
-        productsList.innerHTML = '<p class="empty-message">Arama sonucunda ürün bulunamadı.</p>';
+        productsList.innerHTML = '<p class="empty-message">' + translate('search.noResults') + '</p>';
         return;
     }
 
@@ -442,8 +449,8 @@ function filterProducts() {
                 <button class="btn btn-delete" onclick="deleteProduct(${product.id})">🗑️ Sil</button>
             </div>` : `
             <div class="product-actions">
-                <a class="btn btn-clear" href="login.html">Giriş Yap</a>
-                <a class="btn btn-add" href="signup.html">Katıl</a>
+                <a class="btn btn-clear" href="login.html">${translate('nav.login')}</a>
+                <a class="btn btn-add" href="signup.html">${translate('nav.signup')}</a>
             </div>`}
         </div>
     `).join('');
@@ -517,11 +524,64 @@ const TRANSLATIONS = {
         'nav.signup': 'Katıl',
         'nav.logout': 'Çıkış',
         'nav.subs': 'Abonelikler',
+        'package.free': 'Ücretsiz' ,
+        'nav.home': 'Ana Sayfaya Dön' ,
+        'subscription.title': '🏪 Abonelik Paketleri',
+        'subscription.subtitle': 'Mevcut paketiniz ve yükseltme seçenekleri',
+        'package.basic': 'Basic',
+        'package.basic.desc': 'Haftalık 500 ürün',
+        'package.pro': 'Pro',
+        'package.pro.desc': 'Sınırsız ürün',
+        'package.buy': 'Satın Al',
+        'package.free.price': 'Fiyat: Ücretsiz',
+        'package.free.desc': 'Haftalık 100 ürün ekleme limiti',
+        'package.current': 'Mevcut',
+        'btn.decrease': 'Azalt',
+        'btn.increase': 'Arttır',
+        'btn.edit': 'Düzenle',
+        'btn.delete': 'Sil',
+        'btn.decrease': 'Azalt',
+        'btn.increase': 'Arttır',
+        'btn.edit': 'Düzenle',
+        'btn.delete': 'Sil',
         'empty.message': 'Henüz ürün eklenmemiş. İlk ürünü ekleyerek başlayın!',
         'loginPrompt': 'Lütfen giriş yapın veya kayıt olun.',
         'needLoginAdd': 'Ürün eklemek için giriş yapmalısınız.',
         'subscriptionExpired': 'Aboneliğiniz bitti. Ürün eklemek için aboneliğinizi yenileyin.',
-        'productAddedMessage': 'Ürün başarıyla eklendi! ✓'
+        'productAddedMessage': 'Ürün başarıyla eklendi! ✓',
+        // new messages
+        'alert.fillRequired': 'Lütfen tüm zorunlu alanları doldurun!',
+        'detail.quantity': 'Miktar',
+        'detail.price': 'Fiyat',
+        'detail.total': 'Toplam',
+        'detail.added': 'Eklenme',
+        'btn.decrease': 'Azalt',
+        'btn.increase': 'Arttır',
+        'btn.edit': 'Düzenle',
+        'btn.delete': 'Sil',
+        'confirm.delete': 'Bu ürünü silmek istediğinizden emin misiniz?',
+        'confirm.deleteAll': 'Tüm ürünleri silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.',
+        'productDeleted': 'Ürün silindi ✓',
+        'allDeleted': 'Tüm ürünler başarıyla silindi.',
+        'noProductsToDelete': 'Silinecek ürün yok.',
+        'invalidNumber': 'Geçerli bir adet girin.',
+        'actionNotMeaningfulPro': 'Pro pakette sınırsız olduğu için bu işlem anlamsız.',
+        'limitFull': 'Zaten haftalık limitiniz dolu.',
+        'limitExceeded': 'Haftalık ürün ekleme limitinizi aştınız. Lütfen <a href="subscription.html">abonelik satın alın</a> veya mevcut paketi yükseltin.',
+        'search.noResults': 'Arama sonucunda ürün bulunamadı.',
+        'banner.loginToAdd': 'Ürün eklemek için lütfen <a href="login.html">Giriş Yapın</a> veya <a href="signup.html">Katılın</a>.',
+        'checkout.nameRequired': 'Lütfen ad soyad girin.',
+        'checkout.success': 'Ödeme onaylandı! Aboneliğiniz aktif edildi.',
+        'checkout.pay': 'Ödemeyi Yap ve Abone Ol',
+        'login.subtitle': 'Hesabınıza giriş yapın',
+        'signup.subtitle': 'Hesabınızı oluşturun ve ücretsiz pakete başlayın',
+        'signup.create': 'Hesap Oluştur ve Başla'
+        'auth.usernameTaken': 'Bu kullanıcı adı zaten alınmış. Başka bir isim seçin.',
+        'signup.success': 'Hesap oluşturuldu. Ücretsiz paketle başlıyorsunuz.',
+        'auth.invalidCredentials': 'Hatalı kullanıcı adı veya şifre.',
+        'auth.loginSuccess': 'Giriş başarılı. Hoşgeldiniz, {{user}}',
+        'signup.alreadyHave': 'Zaten hesabınız var mı? Giriş Yap',
+        'login.createAccount': 'Hesap Oluştur'
     },
     en: {
         'header.title': '🏪 Store Inventory Manager',
@@ -549,11 +609,34 @@ const TRANSLATIONS = {
         'nav.signup': 'Sign up',
         'nav.logout': 'Logout',
         'nav.subs': 'Subscriptions',
+        'nav.home': 'Back to Home',
         'empty.message': 'No products yet. Start by adding your first product!',
+        'subscription.title': '🏪 Subscription Plans',
+        'subscription.subtitle': 'Your current plan and upgrade options',
+        'package.basic': 'Basic',
+        'package.basic.desc': 'Weekly 500 products',
+        'package.pro': 'Pro',
+        'package.pro.desc': 'Unlimited products',
+        'package.buy': 'Buy',
+        'package.free.price': 'Price: Free',
+        'package.free.desc': 'Weekly 100 product limit',
+        'package.current': 'Current',
+        'nav.home': 'Back to Home',
         'loginPrompt': 'Please log in or sign up.',
         'needLoginAdd': 'You must be logged in to add products.',
         'subscriptionExpired': 'Your subscription expired. Please renew to add more products.',
-        'productAddedMessage': 'Product added successfully! ✓'
+        'productAddedMessage': 'Product added successfully! ✓',
+        'checkout.title': '💳 Payment & Info',
+        'checkout.subtitle': 'Enter payment details (demo)',
+        'checkout.pay': 'Pay and Subscribe',
+        'detail.quantity': 'Quantity',
+        'detail.price': 'Price',
+        'detail.total': 'Total',
+        'detail.added': 'Added',
+        'btn.decrease': 'Decrease',
+        'btn.increase': 'Increase',
+        'btn.edit': 'Edit',
+        'btn.delete': 'Delete'
     },
     es: {
         'header.title': '🏪 Sistema de Inventario',
@@ -585,7 +668,18 @@ const TRANSLATIONS = {
         'loginPrompt': 'Por favor, inicia sesión o regístrate.',
         'needLoginAdd': 'Debes iniciar sesión para agregar productos.',
         'subscriptionExpired': 'Tu suscripción ha expirado. Por favor renueva para añadir más.',
-        'productAddedMessage': 'Producto agregado con éxito! ✓'
+        'productAddedMessage': 'Producto agregado con éxito! ✓',
+        'checkout.title': '💳 Pago y registro',
+        'checkout.subtitle': 'Ingrese los datos de pago (demo)',
+        'checkout.pay': 'Pagar y suscribirse',
+        'detail.quantity': 'Cantidad',
+        'detail.price': 'Precio',
+        'detail.total': 'Total',
+        'detail.added': 'Agregado',
+        'btn.decrease': 'Disminuir',
+        'btn.increase': 'Aumentar',
+        'btn.edit': 'Editar',
+        'btn.delete': 'Eliminar'
     },
     fr: {
         'header.title': '🏪 Gestionnaire de Stock',
@@ -617,7 +711,18 @@ const TRANSLATIONS = {
         'loginPrompt': 'Veuillez vous connecter ou vous inscrire.',
         'needLoginAdd': 'Vous devez être connecté pour ajouter des produits.',
         'subscriptionExpired': 'Votre abonnement est terminé. Veuillez renouveler.',
-        'productAddedMessage': 'Produit ajouté avec succès! ✓'
+        'productAddedMessage': 'Produit ajouté avec succès! ✓',
+        'checkout.title': '💳 Paiement et enregistrement',
+        'checkout.subtitle': 'Entrez les informations de paiement (demo)',
+        'checkout.pay': 'Payer et s\'abonner',
+        'detail.quantity': 'Quantité',
+        'detail.price': 'Prix',
+        'detail.total': 'Total',
+        'detail.added': 'Ajouté',
+        'btn.decrease': 'Diminuer',
+        'btn.increase': 'Augmenter',
+        'btn.edit': 'Modifier',
+        'btn.delete': 'Supprimer'
     },
     de: {
         'header.title': '🏪 Lagerverwaltung',
@@ -649,7 +754,89 @@ const TRANSLATIONS = {
         'loginPrompt': 'Bitte melden Sie sich an oder registrieren Sie sich.',
         'needLoginAdd': 'Sie müssen angemeldet sein, um Produkte hinzuzufügen.',
         'subscriptionExpired': 'Ihr Abonnement ist beendet. Bitte erneuern.',
-        'productAddedMessage': 'Produkt erfolgreich hinzugefügt! ✓'
+        'productAddedMessage': 'Produkt erfolgreich hinzugefügt! ✓',
+        'checkout.title': '💳 Zahlung und Registrierung',
+        'checkout.subtitle': 'Zahlungsdaten eingeben (Demo)',
+        'checkout.pay': 'Bezahlen und abonnieren',
+        'detail.quantity': 'Anzahl',
+        'detail.price': 'Preis',
+        'detail.total': 'Gesamt',
+        'detail.added': 'Hinzugefügt',
+        'btn.decrease': 'Verringern',
+        'btn.increase': 'Erhöhen',
+        'btn.edit': 'Bearbeiten',
+        'btn.delete': 'Löschen'
+    },
+    ja: {
+        'header.title': '🏪 ストア在庫管理',
+        'subtitle': '在庫を簡単に管理しましょう',
+        'form.newProduct': '新しい商品を追加',
+        'label.productName': '商品名:',
+        'placeholder.productName': '商品名を入力',
+        'label.category': 'カテゴリ:',
+        'label.quantity': '数量:',
+        'placeholder.quantity': '0',
+        'label.price': '価格 (₺):',
+        'placeholder.price': '0.00',
+        'label.description': '説明:',
+        'placeholder.description': '商品の説明（任意）',
+        'btn.add': '➕ 商品を追加',
+        'btn.clear': '🗑️ クリア',
+        'btn.deleteAll': '🧹 すべて削除',
+        'products.title': '商品一覧',
+        'search.placeholder': '商品を検索...',
+        'stats.totalProducts': '合計商品数',
+        'stats.totalStock': '合計在庫',
+        'stats.totalValue': '合計金額',
+        'subscription.info': 'サブスクリプション: <strong id="currentPackage">{{package}}</strong> | 週の残り: <strong id="weeklyRemaining">{{remaining}}</strong>',
+        'nav.login': 'ログイン',
+        'nav.signup': 'サインアップ',
+        'nav.logout': 'ログアウト',
+        'nav.subs': 'サブスクリプション',
+        'empty.message': 'まだ商品がありません。まずは商品を追加しましょう！',
+        'loginPrompt': 'ログインするかアカウントを作成してください。',
+        'needLoginAdd': '商品を追加するにはログインが必要です。',
+        'subscriptionExpired': 'サブスクリプションが終了しました。続けて追加するには更新してください。',
+        'productAddedMessage': '商品が正常に追加されました！ ✓',
+        'alert.fillRequired': '必須項目をすべて入力してください！',
+        'detail.quantity': '数量',
+        'detail.price': '価格',
+        'detail.total': '合計',
+        'detail.added': '追加日',
+        'confirm.delete': 'この商品を削除してもよろしいですか？',
+        'confirm.deleteAll': '本当にすべての商品を削除しますか？この操作は取り消せません。',
+        'productDeleted': '商品が削除されました ✓',
+        'allDeleted': 'すべての商品が削除されました。',
+        'noProductsToDelete': '削除する商品はありません。',
+        'invalidNumber': '有効な数量を入力してください。',
+        'actionNotMeaningfulPro': 'Proプランは無制限のため、この操作は意味がありません。',
+        'limitFull': '既に今週の上限に達しています。',
+        'limitExceeded': '週ごとの商品追加上限を超えました。<a href="subscription.html">サブスクリプションを購入</a>するか、プランをアップグレードしてください。',
+        'search.noResults': '検索結果はありませんでした。',
+        'banner.loginToAdd': '商品を追加するには、まず<a href="login.html">ログイン</a>または<a href="signup.html">サインアップ</a>してください。',
+        'checkout.nameRequired': 'お名前を入力してください。',
+        'checkout.success': '支払いが完了しました！サブスクリプションが有効になりました。',
+        'checkout.title': '💳 支払いと登録',
+        'checkout.subtitle': '支払い情報を入力してください（デモ）',
+        'checkout.pay': '支払いをして登録する',
+        'package.basic': 'Basic',
+        'package.basic.desc': '週に500商品',
+        'package.pro': 'Pro',
+        'package.pro.desc': '無制限の商品',
+        'package.buy': '購入',
+        'nav.home': 'ホームに戻る',
+        'package.free.price': '価格: 無料',
+        'package.free.desc': '週に100商品の追加制限',
+        'package.current': '現行',
+        'auth.usernameTaken': 'このユーザー名は既に使われています。別の名前を選択してください。',
+        'signup.success': 'アカウントが作成されました。無料プランで開始します。',
+        'package.free': '無料',
+        'subscription.title': '🏪 サブスクリプションプラン',
+        'subscription.subtitle': '現在のプランとアップグレードオプション',
+        'auth.invalidCredentials': 'ユーザー名またはパスワードが正しくありません。',
+        'auth.loginSuccess': 'ログイン成功。ようこそ、{{user}}',
+        'signup.alreadyHave': '既にアカウントをお持ちですか？ ログイン',
+        'login.createAccount': 'アカウント作成'
     }
 };
 
@@ -683,6 +870,32 @@ function translatePage() {
     });
 
     // update some dynamic strings in script
+    // translate product detail labels if present
+    translateProductDetails();
+}
+
+function translateProductDetails() {
+    document.querySelectorAll('.product-card').forEach(card => {
+        card.querySelectorAll('.detail-item').forEach(item => {
+            const lbl = item.querySelector('.detail-label');
+            if (!lbl) return;
+            // if not tagged, set a key based on current (possibly original) text
+            if (!lbl.dataset.key) {
+                const t = (lbl.textContent || '').trim();
+                if (/Miktar|Quantity|Cantidad|Quantité|Anzahl|数量/.test(t)) lbl.dataset.key = 'quantity';
+                else if (/Fiyat|Price|Precio|Prix|Preis|価格/.test(t)) lbl.dataset.key = 'price';
+                else if (/Toplam|Total|Total|Total|Gesamt|合計/.test(t)) lbl.dataset.key = 'total';
+                else if (/Eklenme|Added|Agregado|Ajouté|Hinzugefügt|追加/.test(t)) lbl.dataset.key = 'added';
+            }
+            if (lbl.dataset.key) lbl.textContent = translate('detail.' + lbl.dataset.key);
+        });
+
+        // translate action buttons
+        const dec = card.querySelector('.btn-decrease'); if (dec) dec.innerHTML = `➖ ${translate('btn.decrease')}`;
+        const inc = card.querySelector('.btn-increase'); if (inc) inc.innerHTML = `➕ ${translate('btn.increase')}`;
+        const edit = card.querySelector('.btn-edit'); if (edit) edit.innerHTML = `✏️ ${translate('btn.edit')}`;
+        const del = card.querySelector('.btn-delete'); if (del) del.innerHTML = `🗑️ ${translate('btn.delete')}`;
+    });
 }
 
 // Updated message helpers to use translations
@@ -718,7 +931,7 @@ function showSubscriptionPrompt(message) {
     const existing = document.querySelector('.subscribe-message');
     if (existing) existing.remove();
 
-    const msg = message || 'Aboneliğiniz bitti. Ürün eklemek için aboneliğinizi yenileyin.';
+    const msg = message || translate('subscriptionExpired');
     const messageEl = document.createElement('div');
     messageEl.className = 'subscribe-message';
     messageEl.innerHTML = `
@@ -740,14 +953,14 @@ function showLoginPrompt(message) {
     // reuse subscribe message container
     const existing = document.querySelector('.subscribe-message');
     if (existing) existing.remove();
-    const msg = message || 'Lütfen giriş yapın veya kayıt olun.';
+    const msg = message || translate('loginPrompt');
     const messageEl = document.createElement('div');
     messageEl.className = 'subscribe-message';
     messageEl.innerHTML = `
         <div style="flex:1">${msg}</div>
         <div style="display:flex; gap:8px;">
-            <a class="btn btn-add" href="login.html">Giriş Yap</a>
-            <a class="btn btn-clear" href="signup.html">Katıl</a>
+            <a class="btn btn-clear" href="login.html">${translate('nav.login')}</a>
+            <a class="btn btn-clear" href="signup.html">${translate('nav.signup')}</a>
             <button class="btn btn-clear" onclick="this.closest('.subscribe-message').remove()">Çık</button>
         </div>
     `;
@@ -795,7 +1008,7 @@ function updateAuthUI() {
                 const banner = document.createElement('div');
                 banner.id = 'formAuthBanner';
                 banner.className = 'alert-message';
-                banner.innerHTML = 'Ürün eklemek için lütfen <a href="login.html">Giriş Yapın</a> veya <a href="signup.html">Katılın</a>.';
+                banner.innerHTML = translate('banner.loginToAdd');
                 form.parentElement.insertBefore(banner, form);
             }
         } else {

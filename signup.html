@@ -28,9 +28,9 @@
                         <label>İsim (isteğe bağlı):</label>
                         <input type="text" id="suDisplay">
                     </div>
-                    <button type="submit" class="btn btn-add">Hesap Oluştur ve Başla</button>
+                    <button type="submit" class="btn btn-add" data-i18n="signup.create">Hesap Oluştur ve Başla</button>
                 </form>
-                <p style="margin-top:12px;"><a href="login.html" class="btn btn-clear">Zaten Hesabınız Var mı? Giriş Yap</a></p>
+                <p style="margin-top:12px;"><a href="login.html" class="btn btn-clear" data-i18n="signup.alreadyHave">Zaten Hesabınız Var mı? Giriş Yap</a></p>
             </section>
         </main>
     </div>
@@ -49,11 +49,11 @@
             const password = document.getElementById('suPassword').value;
             const display = document.getElementById('suDisplay').value.trim() || username;
 
-            if (!username || !password) return alert('Lütfen kullanıcı adı ve şifre girin.');
+            if (!username || !password) return showAlert(translate('alert.fillRequired'));
 
             const usersKey = 'dukkan_users';
             const users = JSON.parse(localStorage.getItem(usersKey) || '[]');
-            if (users.find(u => u.username === username)) return alert('Bu kullanıcı adı zaten alınmış. Başka bir isim seçin.');
+            if (users.find(u => u.username === username)) return showAlert(translate('auth.usernameTaken'));
 
             const pwHash = await hashPasswordLocal(password);
             users.push({ username: username, passwordHash: pwHash, displayName: display });
@@ -66,7 +66,7 @@
             localStorage.setItem('dukkan_weekly_' + username, JSON.stringify({ start: weekStart, count: 0 }));
             localStorage.setItem('dukkan_products_' + username, JSON.stringify([]));
 
-            alert('Hesap oluşturuldu. Ücretsiz paketle başlıyorsunuz.');
+            showSuccess(translate('signup.success'));
             window.location.href = 'index.html';
         });
     </script>
