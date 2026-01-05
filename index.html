@@ -14,37 +14,55 @@
         <header class="header">
             <div class="header-inner">
                 <div>
-                    <h1>🏪 Dükkan Mal Takip Sistemi</h1>
-                    <p class="subtitle">Envanterinizi Kolayca Yönetin</p>
+                    <h1 data-i18n="header.title">🏪 Dükkan Mal Takip Sistemi</h1>
+                    <p class="subtitle" data-i18n="subtitle">Envanterinizi Kolayca Yönetin</p>
                 </div>
             </div>
         </header>
 
         <section class="subscription-bar">
             <div class="sub-inner">
-                <span>Abonelik: <strong id="currentPackage">Ücretsiz</strong></span>
-                <span>Haftalık Kalan: <strong id="weeklyRemaining">100</strong></span>
+                <span id="subscriptionInfo" data-i18n="subscription.info">Abonelik: <strong id="currentPackage">Ücretsiz</strong> | Haftalık Kalan: <strong id="weeklyRemaining">100</strong></span>
+                <select id="langSelect" aria-label="Dil seçimi" style="margin-left:12px; padding:8px; border-radius:8px; border:1px solid var(--border-color)">
+                    <option value="tr">Türkçe</option>
+                    <option value="en">English</option>
+                    <option value="es">Español</option>
+                    <option value="fr">Français</option>
+                    <option value="de">Deutsch</option>
+                    <option value="it">Italiano</option>
+                    <option value="pt">Português</option>
+                    <option value="ru">Русский</option>
+                    <option value="ar">العربية</option>
+                    <option value="zh">中文 (简体)</option>
+                    <option value="ja">日本語</option>
+                    <option value="ko">한국어</option>
+                    <option value="nl">Nederlands</option>
+                    <option value="pl">Polski</option>
+                    <option value="sv">Svenska</option>
+                    <option value="id">Bahasa Indonesia</option>
+                    <option value="hi">हिन्दी</option>
+                </select>
                 <div class="auth-actions" style="margin-left:auto; display:flex; gap:8px; align-items:center;">
                     <span id="userStatus"></span>
-                    <a id="loginLink" href="login.html" class="btn btn-clear">Giriş Yap</a>
-                    <a id="signupLink" href="signup.html" class="btn btn-add">Katıl</a>
-                    <button id="logoutBtn" class="btn btn-clear" style="display:none">Çıkış</button>
-                    <a id="manageSubscription" href="subscription.html" class="btn btn-clear">Abonelikler</a>
+                    <a id="loginLink" href="login.html" class="btn btn-clear" data-i18n="nav.login">Giriş Yap</a>
+                    <a id="signupLink" href="signup.html" class="btn btn-add" data-i18n="nav.signup">Katıl</a>
+                    <button id="logoutBtn" class="btn btn-clear" style="display:none" data-i18n="nav.logout">Çıkış</button>
+                    <a id="manageSubscription" href="subscription.html" class="btn btn-clear" data-i18n="nav.subs">Abonelikler</a>
                 </div>
             </div>
         </section>
 
         <main class="main-content">
             <section class="form-section">
-                <h2>Yeni Ürün Ekle</h2>
+                <h2 data-i18n="form.newProduct">Yeni Ürün Ekle</h2>
                 <form id="productForm" class="form">
                     <div class="form-group">
-                        <label for="productName">Ürün Adı:</label>
-                        <input type="text" id="productName" placeholder="Ürün adını girin" required>
+                        <label for="productName" data-i18n="label.productName">Ürün Adı:</label>
+                        <input type="text" id="productName" placeholder="Ürün adını girin" data-i18n-placeholder="placeholder.productName" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="productCategory">Kategori:</label>
+                        <label for="productCategory" data-i18n="label.category">Kategori:</label>
                         <select id="productCategory" required>
                             <option value="">Kategori Seçin</option>
                             <option value="Tütün">Tütün ve Tütün Ürünleri</option>
@@ -65,28 +83,28 @@
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="productQuantity">Miktar:</label>
-                            <input type="number" id="productQuantity" placeholder="0" min="1" required>
+                            <label for="productQuantity" data-i18n="label.quantity">Miktar:</label>
+                            <input type="number" id="productQuantity" placeholder="0" data-i18n-placeholder="placeholder.quantity" min="1" required>
                         </div>
                         <div class="form-group">
-                            <label for="productPrice">Fiyat (₺):</label>
-                            <input type="number" id="productPrice" placeholder="0.00" step="0.01" min="0" required>
+                            <label for="productPrice" data-i18n="label.price">Fiyat (₺):</label>
+                            <input type="number" id="productPrice" placeholder="0.00" data-i18n-placeholder="placeholder.price" step="0.01" min="0" required>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="productDescription">Açıklama:</label>
-                        <textarea id="productDescription" placeholder="Ürün açıklaması (opsiyonel)" rows="3"></textarea>
+                        <label for="productDescription" data-i18n="label.description">Açıklama:</label>
+                        <textarea id="productDescription" placeholder="Ürün açıklaması (opsiyonel)" data-i18n-placeholder="placeholder.description" rows="3"></textarea>
                     </div>
 
-                    <button type="submit" class="btn btn-add">➕ Ürün Ekle</button>
+                    <button type="submit" class="btn btn-add" data-i18n="btn.add">➕ Ürün Ekle</button>
                 </form>
             </section>
 
             <section class="search-section">
-                <h2>Ürünler</h2>
+                <h2 data-i18n="products.title">Ürünler</h2>
                 <div class="search-container">
-                    <input type="text" id="searchInput" placeholder="Ürün ara..." class="search-input">
+                    <input type="text" id="searchInput" placeholder="Ürün ara..." class="search-input" data-i18n-placeholder="search.placeholder">
                     <select id="filterCategory" class="filter-select">
                         <option value="">Tüm Kategoriler</option>
                         <option value="Tütün">Tütün ve Tütün Ürünleri</option>
@@ -103,8 +121,8 @@
                         <option value="Kitap">Kitap</option>
                         <option value="Diğer">Diğer</option>
                     </select>
-                    <button id="deleteAllBtn" class="btn btn-danger">🧹 Hepsini Sil</button>
-                    <button id="clearBtn" class="btn btn-clear">🗑️ Temizle</button>
+                    <button id="deleteAllBtn" class="btn btn-danger" data-i18n="btn.deleteAll">🧹 Hepsini Sil</button>
+                    <button id="clearBtn" class="btn btn-clear" data-i18n="btn.clear">🗑️ Temizle</button>
                 </div>
             </section>
 
@@ -117,15 +135,15 @@
             <section class="stats-section">
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <h3>Toplam Ürün</h3>
+                        <h3 data-i18n="stats.totalProducts">Toplam Ürün</h3>
                         <p id="totalProducts" class="stat-value">0</p>
                     </div>
                     <div class="stat-card">
-                        <h3>Toplam Stok</h3>
+                        <h3 data-i18n="stats.totalStock">Toplam Stok</h3>
                         <p id="totalStock" class="stat-value">0</p>
                     </div>
                     <div class="stat-card">
-                        <h3>Toplam Değer</h3>
+                        <h3 data-i18n="stats.totalValue">Toplam Değer</h3>
                         <p id="totalValue" class="stat-value">₺0.00</p>
                     </div>
                 </div>

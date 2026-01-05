@@ -137,6 +137,30 @@ function updateSubscriptionUI() {
         if (limit === Infinity) remEl.textContent = 'Sınırsız';
         else remEl.textContent = Math.max(0, limit - (weeklyData.count || 0));
     }
+
+    // refresh translated subscription info if present
+    const subInfo = document.getElementById('subscriptionInfo');
+    if (subInfo) {
+        const t = translate('subscription.info');
+        if (t) {
+            const html = t.replace('{{package}}', pkgEl ? pkgEl.textContent : '').replace('{{remaining}}', remEl ? remEl.textContent : '');
+            subInfo.innerHTML = html;
+        }
+    }
+
+    // update other translated labels
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        const t = translate(key);
+        if (t) el.innerHTML = t.replace('{{package}}', pkgEl ? pkgEl.textContent : '').replace('{{remaining}}', remEl ? remEl.textContent : '');
+    });
+
+    // placeholders
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        const t = translate(key);
+        if (t) el.placeholder = t;
+    });
 }
 
 // DOM Elementleri
@@ -161,13 +185,31 @@ document.addEventListener('DOMContentLoaded', function () {
     // Auto-login if a valid session exists
     checkSession();
 
+    // set language from storage or browser
+    const savedLang = localStorage.getItem('dukkan_lang');
+    const browserLang = (navigator.language || navigator.userLanguage || 'tr').slice(0,2);
+    const initialLang = savedLang || (TRANSLATIONS[browserLang] ? browserLang : 'tr');
+    localStorage.setItem('dukkan_lang', initialLang);
+
     loadProducts();
     loadPackage();
     loadWeekly();
     renderProducts();
     updateStats();
     updateSubscriptionUI();
+    translatePage();
     updateAuthUI();
+
+    // populate language selector
+    const sel = document.getElementById('langSelect');
+    if (sel) {
+        sel.value = localStorage.getItem('dukkan_lang') || initialLang;
+        sel.addEventListener('change', function() {
+            localStorage.setItem('dukkan_lang', sel.value);
+            translatePage();
+            updateSubscriptionUI();
+        });
+    }
 
     // Event Listeners
     productForm.addEventListener('submit', addProduct);
@@ -259,7 +301,7 @@ function addProduct(e) {
 // Ürünleri Render Et
 function renderProducts() {
     if (products.length === 0) {
-        productsList.innerHTML = '<p class="empty-message">Henüz ürün eklenmemiş. İlk ürünü ekleyerek başlayın!</p>';
+        productsList.innerHTML = `<p class="empty-message">${translate('empty.message')}</p>`;
         return;
     }
 
@@ -447,12 +489,209 @@ function loadProducts() {
     }
 }
 
-// Yardımcı Fonksiyonlar
-function showSuccess(message) {
+// Translation helper and messages
+const TRANSLATIONS = {
+    tr: {
+        'header.title': '🏪 Dükkan Mal Takip Sistemi',
+        'subtitle': 'Envanterinizi Kolayca Yönetin',
+        'form.newProduct': 'Yeni Ürün Ekle',
+        'label.productName': 'Ürün Adı:',
+        'placeholder.productName': 'Ürün adını girin',
+        'label.category': 'Kategori:',
+        'label.quantity': 'Miktar:',
+        'placeholder.quantity': '0',
+        'label.price': 'Fiyat (₺):',
+        'placeholder.price': '0.00',
+        'label.description': 'Açıklama:',
+        'placeholder.description': 'Ürün açıklaması (opsiyonel)',
+        'btn.add': '➕ Ürün Ekle',
+        'btn.clear': '🗑️ Temizle',
+        'btn.deleteAll': '🧹 Hepsini Sil',
+        'products.title': 'Ürünler',
+        'search.placeholder': 'Ürün ara...',
+        'stats.totalProducts': 'Toplam Ürün',
+        'stats.totalStock': 'Toplam Stok',
+        'stats.totalValue': 'Toplam Değer',
+        'subscription.info': 'Abonelik: <strong id="currentPackage">{{package}}</strong> | Haftalık Kalan: <strong id="weeklyRemaining">{{remaining}}</strong>',
+        'nav.login': 'Giriş Yap',
+        'nav.signup': 'Katıl',
+        'nav.logout': 'Çıkış',
+        'nav.subs': 'Abonelikler',
+        'empty.message': 'Henüz ürün eklenmemiş. İlk ürünü ekleyerek başlayın!',
+        'loginPrompt': 'Lütfen giriş yapın veya kayıt olun.',
+        'needLoginAdd': 'Ürün eklemek için giriş yapmalısınız.',
+        'subscriptionExpired': 'Aboneliğiniz bitti. Ürün eklemek için aboneliğinizi yenileyin.',
+        'productAddedMessage': 'Ürün başarıyla eklendi! ✓'
+    },
+    en: {
+        'header.title': '🏪 Store Inventory Manager',
+        'subtitle': 'Manage your inventory easily',
+        'form.newProduct': 'Add New Product',
+        'label.productName': 'Product Name:',
+        'placeholder.productName': 'Enter product name',
+        'label.category': 'Category:',
+        'label.quantity': 'Quantity:',
+        'placeholder.quantity': '0',
+        'label.price': 'Price (₺):',
+        'placeholder.price': '0.00',
+        'label.description': 'Description:',
+        'placeholder.description': 'Product description (optional)',
+        'btn.add': '➕ Add Product',
+        'btn.clear': '🗑️ Clear',
+        'btn.deleteAll': '🧹 Delete All',
+        'products.title': 'Products',
+        'search.placeholder': 'Search products...',
+        'stats.totalProducts': 'Total Products',
+        'stats.totalStock': 'Total Stock',
+        'stats.totalValue': 'Total Value',
+        'subscription.info': 'Subscription: <strong id="currentPackage">{{package}}</strong> | Weekly Remaining: <strong id="weeklyRemaining">{{remaining}}</strong>',
+        'nav.login': 'Log in',
+        'nav.signup': 'Sign up',
+        'nav.logout': 'Logout',
+        'nav.subs': 'Subscriptions',
+        'empty.message': 'No products yet. Start by adding your first product!',
+        'loginPrompt': 'Please log in or sign up.',
+        'needLoginAdd': 'You must be logged in to add products.',
+        'subscriptionExpired': 'Your subscription expired. Please renew to add more products.',
+        'productAddedMessage': 'Product added successfully! ✓'
+    },
+    es: {
+        'header.title': '🏪 Sistema de Inventario',
+        'subtitle': 'Administra tu inventario fácilmente',
+        'form.newProduct': 'Agregar Producto',
+        'label.productName': 'Nombre del producto:',
+        'placeholder.productName': 'Ingrese el nombre del producto',
+        'label.category': 'Categoría:',
+        'label.quantity': 'Cantidad:',
+        'placeholder.quantity': '0',
+        'label.price': 'Precio (₺):',
+        'placeholder.price': '0.00',
+        'label.description': 'Descripción:',
+        'placeholder.description': 'Descripción del producto (opcional)',
+        'btn.add': '➕ Agregar',
+        'btn.clear': '🗑️ Limpiar',
+        'btn.deleteAll': '🧹 Eliminar todo',
+        'products.title': 'Productos',
+        'search.placeholder': 'Buscar productos...',
+        'stats.totalProducts': 'Total Productos',
+        'stats.totalStock': 'Stock Total',
+        'stats.totalValue': 'Valor Total',
+        'subscription.info': 'Suscripción: <strong id="currentPackage">{{package}}</strong> | Restante semanal: <strong id="weeklyRemaining">{{remaining}}</strong>',
+        'nav.login': 'Iniciar sesión',
+        'nav.signup': 'Registrarse',
+        'nav.logout': 'Salir',
+        'nav.subs': 'Suscripciones',
+        'empty.message': 'Aún no hay productos. ¡Agrega el primero!',
+        'loginPrompt': 'Por favor, inicia sesión o regístrate.',
+        'needLoginAdd': 'Debes iniciar sesión para agregar productos.',
+        'subscriptionExpired': 'Tu suscripción ha expirado. Por favor renueva para añadir más.',
+        'productAddedMessage': 'Producto agregado con éxito! ✓'
+    },
+    fr: {
+        'header.title': '🏪 Gestionnaire de Stock',
+        'subtitle': 'Gérez votre inventaire facilement',
+        'form.newProduct': 'Ajouter un produit',
+        'label.productName': 'Nom du produit:',
+        'placeholder.productName': 'Entrez le nom du produit',
+        'label.category': 'Catégorie:',
+        'label.quantity': 'Quantité:',
+        'placeholder.quantity': '0',
+        'label.price': 'Prix (₺):',
+        'placeholder.price': '0.00',
+        'label.description': 'Description:',
+        'placeholder.description': 'Description du produit (optionnel)',
+        'btn.add': '➕ Ajouter',
+        'btn.clear': '🗑️ Effacer',
+        'btn.deleteAll': '🧹 Tout supprimer',
+        'products.title': 'Produits',
+        'search.placeholder': 'Rechercher des produits...',
+        'stats.totalProducts': 'Total Produits',
+        'stats.totalStock': 'Stock Total',
+        'stats.totalValue': 'Valeur Totale',
+        'subscription.info': 'Abonnement: <strong id="currentPackage">{{package}}</strong> | Restant hebdomadaire: <strong id="weeklyRemaining">{{remaining}}</strong>',
+        'nav.login': 'Connexion',
+        'nav.signup': 'S’inscrire',
+        'nav.logout': 'Déconnexion',
+        'nav.subs': 'Abonnements',
+        'empty.message': 'Aucun produit pour le moment. Ajoutez-en un!',
+        'loginPrompt': 'Veuillez vous connecter ou vous inscrire.',
+        'needLoginAdd': 'Vous devez être connecté pour ajouter des produits.',
+        'subscriptionExpired': 'Votre abonnement est terminé. Veuillez renouveler.',
+        'productAddedMessage': 'Produit ajouté avec succès! ✓'
+    },
+    de: {
+        'header.title': '🏪 Lagerverwaltung',
+        'subtitle': 'Verwalten Sie Ihr Inventar einfach',
+        'form.newProduct': 'Neues Produkt',
+        'label.productName': 'Produktname:',
+        'placeholder.productName': 'Produktname eingeben',
+        'label.category': 'Kategorie:',
+        'label.quantity': 'Menge:',
+        'placeholder.quantity': '0',
+        'label.price': 'Preis (₺):',
+        'placeholder.price': '0.00',
+        'label.description': 'Beschreibung:',
+        'placeholder.description': 'Produktbeschreibung (optional)',
+        'btn.add': '➕ Hinzufügen',
+        'btn.clear': '🗑️ Leeren',
+        'btn.deleteAll': '🧹 Alles löschen',
+        'products.title': 'Produkte',
+        'search.placeholder': 'Produkte suchen...',
+        'stats.totalProducts': 'Gesamtprodukte',
+        'stats.totalStock': 'Gesamtbestand',
+        'stats.totalValue': 'Gesamtwert',
+        'subscription.info': 'Abo: <strong id="currentPackage">{{package}}</strong> | Wöchentlich verbleibend: <strong id="weeklyRemaining">{{remaining}}</strong>',
+        'nav.login': 'Anmelden',
+        'nav.signup': 'Registrieren',
+        'nav.logout': 'Abmelden',
+        'nav.subs': 'Abonnements',
+        'empty.message': 'Noch keine Produkte. Fügen Sie ein Produkt hinzu!',
+        'loginPrompt': 'Bitte melden Sie sich an oder registrieren Sie sich.',
+        'needLoginAdd': 'Sie müssen angemeldet sein, um Produkte hinzuzufügen.',
+        'subscriptionExpired': 'Ihr Abonnement ist beendet. Bitte erneuern.',
+        'productAddedMessage': 'Produkt erfolgreich hinzugefügt! ✓'
+    }
+};
+
+function translate(key) {
+    const lang = localStorage.getItem('dukkan_lang') || 'tr';
+    const pool = TRANSLATIONS[lang] || TRANSLATIONS['tr'];
+    return pool[key] || TRANSLATIONS['tr'][key] || '';
+}
+
+function translatePage() {
+    const lang = localStorage.getItem('dukkan_lang') || 'tr';
+
+    // direction for RTL
+    if (['ar', 'he'].includes(lang)) document.documentElement.dir = 'rtl';
+    else document.documentElement.dir = 'ltr';
+
+    // data-i18n elements
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        const t = translate(key);
+        if (!t) return;
+        // replace placeholders for subscription info
+        el.innerHTML = t.replace('{{package}}', document.getElementById('currentPackage') ? document.getElementById('currentPackage').textContent : '').replace('{{remaining}}', document.getElementById('weeklyRemaining') ? document.getElementById('weeklyRemaining').textContent : '');
+    });
+
+    // placeholders
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        const t = translate(key);
+        if (t) el.placeholder = t;
+    });
+
+    // update some dynamic strings in script
+}
+
+// Updated message helpers to use translations
+function showSuccess(messageKeyOrString) {
+    const messageText = TRANSLATIONS[localStorage.getItem('dukkan_lang') || 'tr'][messageKeyOrString] || messageKeyOrString;
     const messageEl = document.createElement('div');
     messageEl.className = 'success-message';
     messageEl.innerHTML = `
-        ${message}
+        ${messageText}
         <button onclick="this.parentElement.remove()">✕</button>
     `;
     document.querySelector('.main-content').insertBefore(messageEl, document.querySelector('.form-section'));
@@ -462,10 +701,11 @@ function showSuccess(message) {
     }, 3000);
 }
 
-function showAlert(message) {
+function showAlert(messageKeyOrString) {
+    const messageText = TRANSLATIONS[localStorage.getItem('dukkan_lang') || 'tr'][messageKeyOrString] || messageKeyOrString;
     const messageEl = document.createElement('div');
     messageEl.className = 'alert-message';
-    messageEl.textContent = message;
+    messageEl.innerHTML = messageText;
     document.querySelector('.main-content').insertBefore(messageEl, document.querySelector('.form-section'));
 
     setTimeout(() => {
