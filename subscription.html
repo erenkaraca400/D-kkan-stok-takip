@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abonelik Paketleri</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-inner">
+                <div>
+                    <h1>🏪 Abonelik Paketleri</h1>
+                    <p class="subtitle">Mevcut paketiniz ve yükseltme seçenekleri</p>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <section class="form-section">
+                <h2>Mevcut Abonelik</h2>
+                <p id="currentSub">Yükleniyor...</p>
+                <div id="status"></div>
+            </section>
+
+            <section class="form-section">
+                <h2>Paketler</h2>
+                <div class="package-grid">
+                    <div class="package-card">
+                        <h3>Ücretsiz</h3>
+                        <p>Haftalık 100 ürün ekleme limiti</p>
+                        <p><strong>Fiyat: Ücretsiz</strong></p>
+                        <button class="btn btn-clear" disabled>Mevcut</button>
+                    </div>
+
+                    <div class="package-card">
+                        <h3>Basic</h3>
+                        <p>Haftalık 500 ürün</p>
+                        <p><strong>₺29.99 / ay</strong></p>
+                        <button class="btn btn-add" onclick="buyPackage('Basic', 500, 29.99)">Satın Al</button>
+                    </div>
+
+                    <div class="package-card">
+                        <h3>Pro</h3>
+                        <p>Sınırsız ürün</p>
+                        <p><strong>₺79.99 / ay</strong></p>
+                        <button class="btn btn-add" onclick="buyPackage('Pro', 'unlimited', 79.99)">Satın Al</button>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <a class="btn btn-clear" href="index.html">← Ana Sayfaya Dön</a>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2026 Dükkan Mal Takip Sistemi</p>
+        </footer>
+    </div>
+
+    <script>
+        const PACKAGE_KEY = 'dukkan_package';
+
+        function buyPackage(name, limit, price) {
+            const pkg = { name: name, limit: limit, price: price, purchasedAt: Date.now() };
+            localStorage.setItem(PACKAGE_KEY, JSON.stringify(pkg));
+            document.getElementById('status').innerHTML = '<div class="success-message">Başarılı: ' + name + ' seçildi. Yönlendiriliyorsunuz... <button onclick="this.parentElement.parentElement.remove()">✕</button></div>';
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1200);
+        }
+
+        function loadCurrent() {
+            const saved = localStorage.getItem(PACKAGE_KEY);
+            const el = document.getElementById('currentSub');
+            if (saved) {
+                try {
+                    const pkg = JSON.parse(saved);
+                    el.textContent = pkg.name + (pkg.limit === 'unlimited' ? ' (Sınırsız)' : ' (' + pkg.limit + '/hafta)');
+                } catch (e) {
+                    el.textContent = 'Ücretsiz (100/hafta)';
+                }
+            } else {
+                el.textContent = 'Ücretsiz (100/hafta)';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadCurrent);
+    </script>
+</body>
+
+</html>

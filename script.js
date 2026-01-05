@@ -1,6 +1,77 @@
 // Veri depolama
 let products = [];
 const STORAGE_KEY = 'dukkan_products';
+const PACKAGE_KEY = 'dukkan_package';
+const WEEKLY_KEY = 'dukkan_weekly';
+
+let userPackage = null;
+let weeklyData = { start: null, count: 0 };
+
+function getWeekStart(date) {
+    const d = new Date(date);
+    const day = (d.getDay() + 6) % 7; // Monday = 0
+    d.setDate(d.getDate() - day);
+    d.setHours(0,0,0,0);
+    return d.toISOString().split('T')[0];
+}
+
+function loadPackage() {
+    const saved = localStorage.getItem(PACKAGE_KEY);
+    if (saved) {
+        try {
+            userPackage = JSON.parse(saved);
+        } catch (e) {
+            userPackage = { name: 'Ücretsiz', limit: 100 };
+        }
+    } else {
+        userPackage = { name: 'Ücretsiz', limit: 100 };
+    }
+}
+
+function savePackage() {
+    localStorage.setItem(PACKAGE_KEY, JSON.stringify(userPackage));
+}
+
+function loadWeekly() {
+    const saved = localStorage.getItem(WEEKLY_KEY);
+    const currentStart = getWeekStart(new Date());
+    if (saved) {
+        try {
+            weeklyData = JSON.parse(saved);
+            if (weeklyData.start !== currentStart) {
+                weeklyData = { start: currentStart, count: 0 };
+                saveWeekly();
+            }
+        } catch (e) {
+            weeklyData = { start: currentStart, count: 0 };
+            saveWeekly();
+        }
+    } else {
+        weeklyData = { start: currentStart, count: 0 };
+        saveWeekly();
+    }
+}
+
+function saveWeekly() {
+    localStorage.setItem(WEEKLY_KEY, JSON.stringify(weeklyData));
+}
+
+function getPackageLimit() {
+    if (!userPackage) return 100;
+    if (userPackage.limit === 'unlimited' || userPackage.limit === Infinity) return Infinity;
+    return userPackage.limit;
+}
+
+function updateSubscriptionUI() {
+    const pkgEl = document.getElementById('currentPackage');
+    const remEl = document.getElementById('weeklyRemaining');
+    if (pkgEl) pkgEl.textContent = userPackage ? userPackage.name : 'Ücretsiz';
+    const limit = getPackageLimit();
+    if (remEl) {
+        if (limit === Infinity) remEl.textContent = 'Sınırsız';
+        else remEl.textContent = Math.max(0, limit - (weeklyData.count || 0));
+    }
+}
 
 // DOM Elementleri
 const productForm = document.getElementById('productForm');
@@ -22,8 +93,11 @@ const totalValueEl = document.getElementById('totalValue');
 // Sayfa yüklendiğinde
 document.addEventListener('DOMContentLoaded', function () {
     loadProducts();
+    loadPackage();
+    loadWeekly();
     renderProducts();
     updateStats();
+    updateSubscriptionUI();
 
     // Event Listeners
     productForm.addEventListener('submit', addProduct);
@@ -41,6 +115,12 @@ function addProduct(e) {
         return;
     }
 
+    const limit = getPackageLimit();
+    if (limit !== Infinity && weeklyData.count >= limit) {
+        showSubscriptionPrompt('Haftalık ürün ekleme limitinizi aştınız. Lütfen <a href="subscription.html">abonelik satın alın</a> veya mevcut paketi yükseltin.');
+        return;
+    }
+
     const newProduct = {
         id: Date.now(),
         name: productName.value.trim(),
@@ -53,8 +133,14 @@ function addProduct(e) {
 
     products.push(newProduct);
     saveProducts();
+
+    // Update weekly count
+    weeklyData.count = (weeklyData.count || 0) + 1;
+    saveWeekly();
+
     renderProducts();
     updateStats();
+    updateSubscriptionUI();
 
     // Formu temizle
     productForm.reset();
@@ -259,6 +345,19 @@ function showAlert(message) {
     setTimeout(() => {
         messageEl.remove();
     }, 3000);
+}
+
+function showSubscriptionPrompt(message) {
+    const messageEl = document.createElement('div');
+    messageEl.className = 'subscribe-message';
+    messageEl.innerHTML = `
+        ${message}
+        <div>
+            <a class="btn btn-add" href="subscription.html">Abonelikler</a>
+            <button onclick="this.parentElement.parentElement.remove()">✕</button>
+        </div>
+    `;
+    document.querySelector('.main-content').insertBefore(messageEl, document.querySelector('.form-section'));
 }
 
 function escapeHtml(text) {
