@@ -105,66 +105,9 @@ document.addEventListener('DOMContentLoaded', function () {
     filterCategory.addEventListener('change', filterProducts);
     clearBtn.addEventListener('click', clearFilters);
 
-    // Test bulk add elements
-    const bulkAddBtn = document.getElementById('bulkAddBtn');
-    const bulkAddFillBtn = document.getElementById('bulkAddFillBtn');
-    const testAddNumber = document.getElementById('testAddNumber');
-
-    if (bulkAddBtn) bulkAddBtn.addEventListener('click', () => {
-        const n = parseInt(testAddNumber.value) || 0;
-        bulkAddTest(n);
-    });
-
-    if (bulkAddFillBtn) bulkAddFillBtn.addEventListener('click', () => {
-        const limit = getPackageLimit();
-        if (limit === Infinity) {
-            showAlert('Pro pakette sınırsız olduğu için bu işlem anlamsız.');
-            return;
-        }
-        const remaining = Math.max(0, limit - (weeklyData.count || 0));
-        if (remaining <= 0) {
-            showSubscriptionPrompt('Zaten haftalık limitiniz dolu.');
-            return;
-        }
-        bulkAddTest(remaining);
-    });
 });
 
-// Hızlı test için bulk-add fonksiyonu
-function bulkAddTest(n) {
-    if (!n || n <= 0) return showAlert('Geçerli bir adet girin.');
 
-    const limit = getPackageLimit();
-    if (limit !== Infinity) {
-        const remaining = Math.max(0, limit - (weeklyData.count || 0));
-        if (remaining <= 0) return showSubscriptionPrompt('Haftalık ürün ekleme limitinizi aştınız. Lütfen abonelik satın alın.');
-        if (n > remaining) n = remaining;
-    }
-
-    const added = [];
-    for (let i = 0; i < n; i++) {
-        const newProduct = {
-            id: Date.now() + i,
-            name: `Test Ürün ${Date.now()}-${i} (test)`,
-            category: 'Diğer',
-            quantity: 1,
-            price: 0.00,
-            description: '(test)',
-            dateAdded: new Date().toLocaleDateString('tr-TR')
-        };
-        products.push(newProduct);
-        weeklyData.count = (weeklyData.count || 0) + 1;
-        added.push(newProduct);
-    }
-
-    saveProducts();
-    saveWeekly();
-    renderProducts();
-    updateStats();
-    updateSubscriptionUI();
-
-    showSuccess(`${added.length} adet test ürün eklendi.`);
-}
 
 // Ürün Ekleme
 function addProduct(e) {
@@ -408,13 +351,18 @@ function showAlert(message) {
 }
 
 function showSubscriptionPrompt(message) {
+    // Remove existing prompt if any
+    const existing = document.querySelector('.subscribe-message');
+    if (existing) existing.remove();
+
+    const msg = message || 'Aboneliğiniz bitti. Ürün eklemek için aboneliğinizi yenileyin.';
     const messageEl = document.createElement('div');
     messageEl.className = 'subscribe-message';
     messageEl.innerHTML = `
-        ${message}
-        <div>
-            <a class="btn btn-add" href="subscription.html">Abonelikler</a>
-            <button onclick="this.parentElement.parentElement.remove()">✕</button>
+        <div style="flex:1">${msg}</div>
+        <div style="display:flex; gap:8px;">
+            <a class="btn btn-add" href="subscription.html">Abonelik Al</a>
+            <button class="btn btn-clear" onclick="this.closest('.subscribe-message').remove()">Çık</button>
         </div>
     `;
     document.querySelector('.main-content').insertBefore(messageEl, document.querySelector('.form-section'));
