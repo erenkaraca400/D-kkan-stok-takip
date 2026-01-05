@@ -394,3 +394,7 @@ function escapeHtml(text) {
     };
     return text.replace(/[&<>"']/g, m => map[m]);
 }
+function buyPackage(name, limit, price) {
+    // Bilgileri URL parametresi olarak gönderiyoruz
+    window.location.href = `checkout.html?name=${name}&limit=${limit}&price=${price}`;
+}
