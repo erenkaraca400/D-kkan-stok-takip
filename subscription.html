@@ -66,12 +66,9 @@
         const PACKAGE_KEY = 'dukkan_package';
 
         function buyPackage(name, limit, price) {
-            const pkg = { name: name, limit: limit, price: price, purchasedAt: Date.now() };
-            localStorage.setItem(PACKAGE_KEY, JSON.stringify(pkg));
-            document.getElementById('status').innerHTML = '<div class="success-message">Başarılı: ' + name + ' seçildi. Yönlendiriliyorsunuz... <button onclick="this.parentElement.parentElement.remove()">✕</button></div>';
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 1200);
+            // Yönlendir: önce ödeme formuna git (kullanıcının kart bilgilerini girmesi için)
+            const url = `checkout.html?name=${encodeURIComponent(name)}&limit=${encodeURIComponent(limit)}&price=${encodeURIComponent(price)}`;
+            window.location.href = url;
         }
 
         function loadCurrent() {
