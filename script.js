@@ -10,36 +10,6 @@ function normalizeText(text) {
 }
 
 /***********************
- * TRANSLATIONS
- ***********************/
-const TRANSLATIONS = {
-    tr: {
-        "header.title": "🏪 Dükkan Mal Takip Sistemi",
-        "subtitle": "Envanterinizi Kolayca Yönetin",
-        "form.newProduct": "Yeni Ürün",
-        "btn.add": "Ürün Ekle"
-    },
-    en: {
-        "header.title": "🏪 Store Inventory System",
-        "subtitle": "Manage Your Inventory Easily",
-        "form.newProduct": "New Product",
-        "btn.add": "Add Product"
-    }
-};
-
-let currentLang = "tr";
-
-function translatePage() {
-    document.querySelectorAll("[data-i18n]").forEach(el => {
-        const key = el.getAttribute("data-i18n");
-        if (TRANSLATIONS[currentLang][key]) {
-            el.textContent = TRANSLATIONS[currentLang][key];
-        }
-    });
-}
-translatePage();
-
-/***********************
  * STORAGE
  ***********************/
 const STORAGE_KEY = "products";
@@ -57,14 +27,15 @@ function renderProducts(list) {
         return;
     }
 
-    list.forEach(p => {
+    list.forEach((p, index) => {
         const div = document.createElement("div");
         div.className = "product";
         div.innerHTML = `
             <strong>${p.name}</strong><br>
             Kategori: ${p.category}<br>
             Miktar: ${p.quantity}<br>
-            Fiyat: ₺${p.price}
+            Fiyat: ₺${p.price}<br><br>
+            <button onclick="deleteProduct(${index})">❌ Sil</button>
         `;
         container.appendChild(div);
     });
@@ -90,6 +61,35 @@ document.getElementById("productForm").addEventListener("submit", e => {
 });
 
 /***********************
+ * DELETE ONE
+ ***********************/
+function deleteProduct(index) {
+    if (!confirm("Bu ürünü silmek istiyor musun?")) return;
+    products.splice(index, 1);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+    renderProducts(products);
+}
+
+/***********************
+ * DELETE ALL
+ ***********************/
+document.getElementById("deleteAllBtn").addEventListener("click", () => {
+    if (!confirm("TÜM ürünler silinsin mi?")) return;
+    products = [];
+    localStorage.removeItem(STORAGE_KEY);
+    renderProducts(products);
+});
+
+/***********************
+ * CLEAR (FORM + SEARCH)
+ ***********************/
+document.getElementById("clearBtn").addEventListener("click", () => {
+    document.getElementById("searchInput").value = "";
+    document.getElementById("filterCategory").value = "";
+    renderProducts(products);
+});
+
+/***********************
  * SEARCH + FILTER
  ***********************/
 function filterProducts() {
@@ -98,9 +98,7 @@ function filterProducts() {
 
     const filtered = products.filter(p => {
         const name = normalizeText(p.name);
-        const matchText = name.includes(search);
-        const matchCat = cat === "" || p.category === cat;
-        return matchText && matchCat;
+        return name.includes(search) && (cat === "" || p.category === cat);
     });
 
     renderProducts(filtered);
