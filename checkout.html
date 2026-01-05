@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ödeme ve Kimlik Bilgileri</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🛡️ Güvenli Ödeme</h1>
+            <p class="subtitle">Aboneliğinizi tamamlamak için bilgileri doldurun</p>
+        </header>
+
+        <main class="main-content">
+            <section class="form-section">
+                <h2 id="selectedPackageTitle">Seçilen Paket: </h2>
+                <form id="checkoutForm" class="form">
+                    <div class="form-group">
+                        <label for="fullName">Ad Soyad:</label>
+                        <input type="text" id="fullName" placeholder="TC Kimlik üzerindeki ad soyad" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tcNo">TC Kimlik No:</label>
+                        <input type="text" id="tcNo" maxlength="11" placeholder="11 haneli TC No" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cardNumber">Kart Numarası:</label>
+                        <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Son Kullanma:</label>
+                            <input type="text" placeholder="AA/YY" required>
+                        </div>
+                        <div class="form-group">
+                            <label>CVV:</label>
+                            <input type="password" placeholder="***" maxlength="3" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-add" style="width: 100%; margin-top: 20px;">Ödemeyi Tamamla ve Abone Ol</button>
+                    <a href="subscription.html" class="btn btn-clear" style="display: block; text-align: center; margin-top: 10px;">Vazgeç</a>
+                </form>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Sayfa yüklendiğinde hangi paketin seçildiğini URL'den alalım
+        const urlParams = new URLSearchParams(window.location.search);
+        const packageName = urlParams.get('name');
+        const packageLimit = urlParams.get('limit');
+        const packagePrice = urlParams.get('price');
+
+        document.getElementById('selectedPackageTitle').innerText += packageName + " (₺" + packagePrice + ")";
+
+        document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Verileri kaydet
+            const pkg = { 
+                name: packageName, 
+                limit: packageLimit === 'unlimited' ? 'unlimited' : parseInt(packageLimit), 
+                price: packagePrice, 
+                purchasedAt: Date.now() 
+            };
+            
+            localStorage.setItem('dukkan_package', JSON.stringify(pkg));
+            
+            alert("Ödeme Başarılı! Aboneliğiniz aktif edildi.");
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>
