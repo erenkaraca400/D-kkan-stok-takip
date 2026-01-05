@@ -24,7 +24,13 @@
             <div class="sub-inner">
                 <span>Abonelik: <strong id="currentPackage">Ücretsiz</strong></span>
                 <span>Haftalık Kalan: <strong id="weeklyRemaining">100</strong></span>
-                <a id="manageSubscription" href="subscription.html" class="btn btn-clear" style="margin-left:auto">Abonelikler</a>
+                <div class="auth-actions" style="margin-left:auto; display:flex; gap:8px; align-items:center;">
+                    <span id="userStatus"></span>
+                    <a id="loginLink" href="login.html" class="btn btn-clear">Giriş Yap</a>
+                    <a id="signupLink" href="signup.html" class="btn btn-add">Katıl</a>
+                    <button id="logoutBtn" class="btn btn-clear" style="display:none">Çıkış</button>
+                    <a id="manageSubscription" href="subscription.html" class="btn btn-clear">Abonelikler</a>
+                </div>
             </div>
         </section>
 

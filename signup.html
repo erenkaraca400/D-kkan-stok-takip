@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katıl - Yeni Hesap</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>📝 Yeni Hesap Oluştur</h1>
+            <p class="subtitle">Hesabınızı oluşturun ve ücretsiz pakete başlayın</p>
+        </header>
+
+        <main class="main-content">
+            <section class="form-section">
+                <form id="signupForm">
+                    <div class="form-group">
+                        <label>Kullanıcı Adı (kısa):</label>
+                        <input type="text" id="suUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Şifre:</label>
+                        <input type="password" id="suPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label>İsim (isteğe bağlı):</label>
+                        <input type="text" id="suDisplay">
+                    </div>
+                    <button type="submit" class="btn btn-add">Hesap Oluştur ve Başla</button>
+                </form>
+                <p style="margin-top:12px;"><a href="login.html" class="btn btn-clear">Zaten Hesabınız Var mı? Giriş Yap</a></p>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('signupForm').addEventListener('submit', function(e){
+            e.preventDefault();
+            const username = document.getElementById('suUsername').value.trim();
+            const password = document.getElementById('suPassword').value;
+            const display = document.getElementById('suDisplay').value.trim() || username;
+
+            if (!username || !password) return alert('Lütfen kullanıcı adı ve şifre girin.');
+
+            const usersKey = 'dukkan_users';
+            const users = JSON.parse(localStorage.getItem(usersKey) || '[]');
+            if (users.find(u => u.username === username)) return alert('Bu kullanıcı adı zaten alınmış. Başka bir isim seçin.');
+
+            users.push({ username: username, password: password, displayName: display });
+            localStorage.setItem(usersKey, JSON.stringify(users));
+
+            // set current user and initialize package + weekly + products for user
+            localStorage.setItem('dukkan_current_user', username);
+            localStorage.setItem('dukkan_package_' + username, JSON.stringify({ name: 'Ücretsiz', limit: 100 }));
+            const weekStart = (new Date()).toISOString().split('T')[0];
+            localStorage.setItem('dukkan_weekly_' + username, JSON.stringify({ start: weekStart, count: 0 }));
+            localStorage.setItem('dukkan_products_' + username, JSON.stringify([]));
+
+            alert('Hesap oluşturuldu. Ücretsiz paketle başlıyorsunuz.');
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>

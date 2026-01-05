@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giriş Yap</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🔐 Giriş Yap</h1>
+            <p class="subtitle">Hesabınıza giriş yapın</p>
+        </header>
+
+        <main class="main-content">
+            <section class="form-section">
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label>Kullanıcı Adı:</label>
+                        <input type="text" id="liUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Şifre:</label>
+                        <input type="password" id="liPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-add">Giriş Yap</button>
+                </form>
+                <p style="margin-top:12px;"><a href="signup.html" class="btn btn-clear">Hesap Oluştur</a></p>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e){
+            e.preventDefault();
+            const username = document.getElementById('liUsername').value.trim();
+            const password = document.getElementById('liPassword').value;
+            if (!username || !password) return alert('Lütfen kullanıcı adı ve şifre girin.');
+
+            const users = JSON.parse(localStorage.getItem('dukkan_users') || '[]');
+            const u = users.find(x => x.username === username && x.password === password);
+            if (!u) return alert('Hatalı kullanıcı adı veya şifre.');
+
+            localStorage.setItem('dukkan_current_user', username);
+            alert('Giriş başarılı. Hoşgeldiniz, ' + (u.displayName || username));
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>

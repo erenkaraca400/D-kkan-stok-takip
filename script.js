@@ -3,20 +3,56 @@ let products = [];
 const STORAGE_KEY = 'dukkan_products';
 const PACKAGE_KEY = 'dukkan_package';
 const WEEKLY_KEY = 'dukkan_weekly';
+const CURRENT_USER_KEY = 'dukkan_current_user';
+const USERS_KEY = 'dukkan_users';
 
 let userPackage = null;
 let weeklyData = { start: null, count: 0 };
 
 function getWeekStart(date) {
     const d = new Date(date);
-    const day = (d.getDay() + 6) % 7; // Monday = 0
+    const day = (d.getDay() + 6) % 7; // Monday = 0 (Monday-based week start)
     d.setDate(d.getDate() - day);
     d.setHours(0,0,0,0);
     return d.toISOString().split('T')[0];
 }
 
+// User helpers
+function getCurrentUser() {
+    return localStorage.getItem(CURRENT_USER_KEY);
+}
+
+function setCurrentUser(username) {
+    if (username) localStorage.setItem(CURRENT_USER_KEY, username);
+    else localStorage.removeItem(CURRENT_USER_KEY);
+}
+
+function usersList() {
+    const s = localStorage.getItem(USERS_KEY);
+    return s ? JSON.parse(s) : [];
+}
+
+function saveUsers(list) {
+    localStorage.setItem(USERS_KEY, JSON.stringify(list));
+}
+
+function productsKeyFor(user) {
+    return STORAGE_KEY + (user ? '_' + user : '');
+}
+
+function packageKeyFor(user) {
+    return PACKAGE_KEY + (user ? '_' + user : '');
+}
+
+function weeklyKeyFor(user) {
+    return WEEKLY_KEY + (user ? '_' + user : '');
+}
+
+// Package load/save per user
 function loadPackage() {
-    const saved = localStorage.getItem(PACKAGE_KEY);
+    const user = getCurrentUser();
+    const key = packageKeyFor(user);
+    const saved = localStorage.getItem(key);
     if (saved) {
         try {
             userPackage = JSON.parse(saved);
@@ -29,11 +65,16 @@ function loadPackage() {
 }
 
 function savePackage() {
-    localStorage.setItem(PACKAGE_KEY, JSON.stringify(userPackage));
+    const user = getCurrentUser();
+    const key = packageKeyFor(user);
+    localStorage.setItem(key, JSON.stringify(userPackage));
 }
 
+// Weekly load/save per user
 function loadWeekly() {
-    const saved = localStorage.getItem(WEEKLY_KEY);
+    const user = getCurrentUser();
+    const key = weeklyKeyFor(user);
+    const saved = localStorage.getItem(key);
     const currentStart = getWeekStart(new Date());
     if (saved) {
         try {
@@ -53,9 +94,10 @@ function loadWeekly() {
 }
 
 function saveWeekly() {
-    localStorage.setItem(WEEKLY_KEY, JSON.stringify(weeklyData));
+    const user = getCurrentUser();
+    const key = weeklyKeyFor(user);
+    localStorage.setItem(key, JSON.stringify(weeklyData));
 }
-
 function getPackageLimit() {
     if (!userPackage) return 100;
     if (userPackage.limit === 'unlimited' || userPackage.limit === Infinity) return Infinity;
@@ -98,6 +140,7 @@ document.addEventListener('DOMContentLoaded', function () {
     renderProducts();
     updateStats();
     updateSubscriptionUI();
+    updateAuthUI();
 
     // Event Listeners
     productForm.addEventListener('submit', addProduct);
@@ -109,6 +152,20 @@ document.addEventListener('DOMContentLoaded', function () {
     const deleteAllBtn = document.getElementById('deleteAllBtn');
     if (deleteAllBtn) deleteAllBtn.addEventListener('click', deleteAllProducts);
 
+    // Logout button
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) logoutBtn.addEventListener('click', function () {
+        setCurrentUser(null);
+        // reload per-user state (back to guest)
+        loadProducts();
+        loadPackage();
+        loadWeekly();
+        renderProducts();
+        updateStats();
+        updateSubscriptionUI();
+        updateAuthUI();
+        showSuccess('Oturum kapatıldı.');
+    });
 });
 
 function deleteAllProducts() {
@@ -325,17 +382,23 @@ function updateStats() {
 
 // LocalStorage İşlemleri
 function saveProducts() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+    const user = getCurrentUser();
+    const key = productsKeyFor(user);
+    localStorage.setItem(key, JSON.stringify(products));
 }
 
 function loadProducts() {
-    const saved = localStorage.getItem(STORAGE_KEY);
+    const user = getCurrentUser();
+    const key = productsKeyFor(user);
+    const saved = localStorage.getItem(key);
     if (saved) {
         try {
             products = JSON.parse(saved);
         } catch (e) {
             products = [];
         }
+    } else {
+        products = [];
     }
 }
 
@@ -381,6 +444,27 @@ function showSubscriptionPrompt(message) {
         </div>
     `;
     document.querySelector('.main-content').insertBefore(messageEl, document.querySelector('.form-section'));
+}
+
+// Auth UI
+function updateAuthUI() {
+    const user = getCurrentUser();
+    const userStatus = document.getElementById('userStatus');
+    const loginLink = document.getElementById('loginLink');
+    const signupLink = document.getElementById('signupLink');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    if (user) {
+        if (userStatus) userStatus.textContent = `Hoşgeldin, ${user}`;
+        if (loginLink) loginLink.style.display = 'none';
+        if (signupLink) signupLink.style.display = 'none';
+        if (logoutBtn) logoutBtn.style.display = 'inline-block';
+    } else {
+        if (userStatus) userStatus.textContent = '';
+        if (loginLink) loginLink.style.display = 'inline-block';
+        if (signupLink) signupLink.style.display = 'inline-block';
+        if (logoutBtn) logoutBtn.style.display = 'none';
+    }
 }
 
 function escapeHtml(text) {

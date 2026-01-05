@@ -50,10 +50,26 @@
         document.getElementById('paymentForm').onsubmit = function(e) {
             e.preventDefault();
             
-            // Aboneliği kaydet
+            // Basit form doğrulaması
+            const userName = document.getElementById('userName').value.trim();
+            if (!userName) return alert('Lütfen ad soyad girin.');
+
+            // Aboneliği kaydet (kullanıcıya özel)
+            const currentUser = localStorage.getItem('dukkan_current_user');
             const pkg = { name: name, limit: limit, price: price, purchasedAt: Date.now() };
-            localStorage.setItem('dukkan_package', JSON.stringify(pkg));
-            
+            if (currentUser) {
+                localStorage.setItem('dukkan_package_' + currentUser, JSON.stringify(pkg));
+            } else {
+                // guest fallback
+                localStorage.setItem('dukkan_package', JSON.stringify(pkg));
+            }
+
+            // reset user's weekly counter when they upgrade
+            if (currentUser) {
+                const weekStart = (new Date()).toISOString().split('T')[0];
+                localStorage.setItem('dukkan_weekly_' + currentUser, JSON.stringify({ start: weekStart, count: 0 }));
+            }
+
             alert("Ödeme onaylandı! Aboneliğiniz aktif edildi.");
             window.location.href = 'index.html';
         };

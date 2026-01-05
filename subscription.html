@@ -66,7 +66,14 @@
         const PACKAGE_KEY = 'dukkan_package';
 
         function buyPackage(name, limit, price) {
-            // Yönlendir: önce ödeme formuna git (kullanıcının kart bilgilerini girmesi için)
+            // require login: if not logged in, prompt to sign up / login first
+            const currentUser = localStorage.getItem('dukkan_current_user');
+            if (!currentUser) {
+                alert('Lütfen önce giriş yapın veya kayıt olun.');
+                window.location.href = 'login.html';
+                return;
+            }
+            // Yönlendir: ödeme formuna git (kullanıcının kart bilgilerini girmesi için)
             const url = `checkout.html?name=${encodeURIComponent(name)}&limit=${encodeURIComponent(limit)}&price=${encodeURIComponent(price)}`;
             window.location.href = url;
         }
