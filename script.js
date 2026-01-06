@@ -127,6 +127,19 @@ function updateStats() {
     if (totalValueEl) totalValueEl.textContent = '₺' + totalValue.toFixed(2);
 }
 
+function updateProductFormState() {
+    const user = getCurrentUser();
+    const fields = ['productName','productCategory','productQuantity','productPrice','productDescription'];
+    fields.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.disabled = !user;
+    });
+    const submitBtn = document.querySelector('#productForm button[type="submit"]');
+    if (submitBtn) submitBtn.disabled = !user;
+    const note = document.getElementById('productLockNote');
+    if (note) note.style.display = user ? 'none' : 'block';
+} 
+
 function updateCriticalList() {
     const el = document.getElementById('criticalList');
     if (!el) return;
@@ -360,6 +373,8 @@ const TRANSLATIONS = {
         'lang.es': 'Español',
         'lang.fr': 'Français',
         'products.add': 'Yeni Ürün Ekle',
+        'products.login_required': 'Ürün eklemek için giriş yapın veya kayıt olun',
+        'products.add_requires_login': 'Lütfen ürün eklemek için giriş yapın',
         'login.title': '🔐 Giriş Yap',
         'login.subtitle': 'Hesabınıza giriş yapın',
         'signup.title': '📝 Yeni Hesap Oluştur',
@@ -416,6 +431,8 @@ const TRANSLATIONS = {
         'lang.es': 'Español',
         'lang.fr': 'Français',
         'products.add': 'Add New Product',
+        'products.login_required': 'Sign in or sign up to add products',
+        'products.add_requires_login': 'Please sign in to add a product',
         'login.title': '🔐 Login',
         'login.subtitle': 'Sign in to your account',
         'signup.title': '📝 Create Account',
@@ -471,6 +488,8 @@ const TRANSLATIONS = {
         'lang.es': 'Español',
         'lang.fr': 'Français',
         'products.add': 'Agregar Producto',
+        'products.login_required': 'Inicie sesión o regístrese para agregar productos',
+        'products.add_requires_login': 'Por favor, inicie sesión para agregar un producto',
         'login.title': '🔐 Iniciar Sesión',
         'login.subtitle': 'Ingrese a su cuenta',
         'signup.title': '📝 Crear Cuenta',
@@ -526,6 +545,8 @@ const TRANSLATIONS = {
         'lang.es': 'Español',
         'lang.fr': 'Français',
         'products.add': 'Ajouter un produit',
+        'products.login_required': 'Connectez-vous ou inscrivez-vous pour ajouter des produits',
+        'products.add_requires_login': 'Veuillez vous connecter pour ajouter un produit',
         'login.title': '🔐 Connexion',
         'login.subtitle': 'Connectez-vous à votre compte',
         'signup.title': '📝 Créer un compte',
@@ -636,6 +657,8 @@ function updateAuthUI() {
         if (subsLink) subsLink.textContent = t('nav.subs');
         if (settingsLink) settingsLink.textContent = t('nav.settings');
     }
+    // keep product form state in sync with auth
+    if (typeof updateProductFormState === 'function') updateProductFormState();
 }
 
 // SETTINGS handler (account save)

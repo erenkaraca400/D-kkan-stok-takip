@@ -146,6 +146,8 @@ aside nav ul li a:hover {
     margin-bottom: 20px;
 }
 
+.note { font-size:14px; color:#c0392b; margin-bottom:10px; }
+
 .form-group {
     display: flex;
     flex-direction: column;
