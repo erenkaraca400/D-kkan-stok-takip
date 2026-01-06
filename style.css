@@ -258,15 +258,8 @@ input, select, textarea {
     border-color: var(--border);
 }
 
-
+/* Soft theme (non-black) - removed per request */
  
 
 
-.kapsayici {
-  display: flex;
-  flex-wrap: wrap; /* Sığmazsa alt satıra geçmesini sağlar */
-}
 
-.kutu {
-  flex: 1 1 300px; /* En az 300px olsun, sığmazsa aşağı kaysın */
-}
