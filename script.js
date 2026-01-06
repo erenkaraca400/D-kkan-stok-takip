@@ -131,13 +131,14 @@ if (productForm) {
  * DELETE / DELETE BY ID
  ***********************/
 function deleteProductById(id) {
-    if (!confirm("Bu ürünü silmek istiyor musun?")) return;
+    if (!confirm(t('confirm_delete_product'))) return;
     const idx = products.findIndex(p => p.id === id);
     if (idx === -1) return;
     products.splice(idx, 1);
     if (selectedProductId === id) selectedProductId = null;
     saveProducts();
     filterProducts();
+    alert(t('product_deleted'));
 }
 
 /***********************
@@ -146,7 +147,7 @@ function deleteProductById(id) {
 const deleteAllBtn = document.getElementById("deleteAllBtn");
 if (deleteAllBtn) {
     deleteAllBtn.addEventListener("click", () => {
-        if (!confirm("TÜM ürünler silinsin mi?")) return;
+        if (!confirm(t('delete_all_confirm'))) return;
         products = [];
         selectedProductId = null;
         localStorage.removeItem(STORAGE_KEY);
@@ -199,12 +200,12 @@ if (signupForm) {
         const password = document.getElementById('suPassword').value;
         const display = document.getElementById('suDisplay').value.trim() || username;
         if (!username || !password) {
-            alert('Kullanıcı adı ve şifre gerekli');
+            alert(t('username_password_required'));
             return;
         }
         const users = getUsers();
         if (users.some(u => u.username === username)) {
-            alert('Bu kullanıcı adı zaten alınmış');
+            alert(t('signup_user_taken'));
             return;
         }
         users.push({username, password, display});
@@ -229,7 +230,7 @@ if (loginForm) {
         const users = getUsers();
         const user = users.find(u => u.username === username && u.password === password);
         if (!user) {
-            alert('Kullanıcı adı veya şifre yanlış');
+            alert(t('login_wrong'));
             return;
         }
         // set current user (if remember, we keep it; otherwise still store — simple app)
@@ -268,6 +269,10 @@ const TRANSLATIONS = {
         'nav.home': '← Ana Sayfaya Dön',
         'nav.subLabel': 'Abonelik:',
         'nav.weekly': 'Haftalık Kalan:',
+        'lang.tr': 'Türkçe',
+        'lang.en': 'English',
+        'lang.es': 'Español',
+        'lang.fr': 'Français',
         'products.add': 'Yeni Ürün Ekle',
         'login.title': '🔐 Giriş Yap',
         'login.subtitle': 'Hesabınıza giriş yapın',
@@ -288,7 +293,17 @@ const TRANSLATIONS = {
         'settings.themeLabel': 'Temayı Seç',
         'theme.light': 'Açık (varsayılan)',
         'theme.soft': 'Yumuşak',
+        'theme.dark': 'Koyu',
         'save': 'Kaydet',
+        'settings_saved': 'Ayarlar kaydedildi',
+        'account_saved': 'Hesap ayarları kaydedildi',
+        'confirm_delete_product': 'Bu ürünü silmek istiyor musunuz?',
+        'delete_all_confirm': 'Tüm ürünler silinsin mi?',
+        'product_deleted': 'Ürün silindi',
+        'login_wrong': 'Kullanıcı adı veya şifre yanlış',
+        'signup_user_taken': 'Bu kullanıcı adı zaten alınmış',
+        'username_password_required': 'Kullanıcı adı ve şifre gerekli',
+        'account_changes_require_login': 'Hesap değişiklikleri için giriş yapın',
         'greeting': 'Hoşgeldiniz,',
         'logout': 'Çıkış'
     },
@@ -302,6 +317,10 @@ const TRANSLATIONS = {
         'nav.home': '← Back to Home',
         'nav.subLabel': 'Subscription:',
         'nav.weekly': 'Weekly Remaining:',
+        'lang.tr': 'Türkçe',
+        'lang.en': 'English',
+        'lang.es': 'Español',
+        'lang.fr': 'Français',
         'products.add': 'Add New Product',
         'login.title': '🔐 Login',
         'login.subtitle': 'Sign in to your account',
@@ -321,8 +340,17 @@ const TRANSLATIONS = {
         'settings.interfaceNote': 'Customize your interface (no dark/black theme).',
         'settings.themeLabel': 'Choose theme',
         'theme.light': 'Light (default)',
-        'theme.soft': 'Soft',
+        'theme.dark': 'Dark',
         'save': 'Save',
+        'settings_saved': 'Settings saved',
+        'account_saved': 'Account settings saved',
+        'confirm_delete_product': 'Are you sure you want to delete this product?',
+        'delete_all_confirm': 'Delete ALL products?',
+        'product_deleted': 'Product deleted',
+        'login_wrong': 'Username or password is incorrect',
+        'signup_user_taken': 'That username is already taken',
+        'username_password_required': 'Username and password are required',
+        'account_changes_require_login': 'Please sign in to change account settings',
         'greeting': 'Welcome,',
         'logout': 'Logout'
     },
@@ -336,6 +364,10 @@ const TRANSLATIONS = {
         'nav.home': '← Volver al Inicio',
         'nav.subLabel': 'Suscripción:',
         'nav.weekly': 'Restante Semanal:',
+        'lang.tr': 'Türkçe',
+        'lang.en': 'English',
+        'lang.es': 'Español',
+        'lang.fr': 'Français',
         'products.add': 'Agregar Producto',
         'login.title': '🔐 Iniciar Sesión',
         'login.subtitle': 'Ingrese a su cuenta',
@@ -355,8 +387,17 @@ const TRANSLATIONS = {
         'settings.interfaceNote': 'Personaliza tu interfaz (sin tema negro).',
         'settings.themeLabel': 'Seleccionar tema',
         'theme.light': 'Claro (predeterminado)',
-        'theme.soft': 'Suave',
+        'theme.dark': 'Oscuro',
         'save': 'Guardar',
+        'settings_saved': 'Ajustes guardados',
+        'account_saved': 'Ajustes de cuenta guardados',
+        'confirm_delete_product': '¿Seguro que quieres eliminar este producto?',
+        'delete_all_confirm': '¿Eliminar TODOS los productos?',
+        'product_deleted': 'Producto eliminado',
+        'login_wrong': 'Usuario o contraseña incorrectos',
+        'signup_user_taken': 'Ese nombre de usuario ya existe',
+        'username_password_required': 'Usuario y contraseña requeridos',
+        'account_changes_require_login': 'Inicie sesión para cambiar la cuenta',
         'greeting': 'Bienvenido,',
         'logout': 'Cerrar Sesión'
     },
@@ -370,6 +411,10 @@ const TRANSLATIONS = {
         'nav.home': '← Retour à l’accueil',
         'nav.subLabel': 'Abonnement:',
         'nav.weekly': 'Restant Hebdomadaire:',
+        'lang.tr': 'Türkçe',
+        'lang.en': 'English',
+        'lang.es': 'Español',
+        'lang.fr': 'Français',
         'products.add': 'Ajouter un produit',
         'login.title': '🔐 Connexion',
         'login.subtitle': 'Connectez-vous à votre compte',
@@ -389,8 +434,17 @@ const TRANSLATIONS = {
         'settings.interfaceNote': "Personnalisez l'interface (pas de thème noir).",
         'settings.themeLabel': 'Choisir le thème',
         'theme.light': 'Clair (par défaut)',
-        'theme.soft': 'Doux',
+        'theme.dark': 'Sombre',
         'save': 'Enregistrer',
+        'settings_saved': 'Paramètres enregistrés',
+        'account_saved': 'Paramètres du compte enregistrés',
+        'confirm_delete_product': 'Voulez-vous vraiment supprimer ce produit ?',
+        'delete_all_confirm': 'Supprimer TOUS les produits ?',
+        'product_deleted': 'Produit supprimé',
+        'login_wrong': 'Nom d’utilisateur ou mot de passe incorrect',
+        'signup_user_taken': 'Ce nom d’utilisateur est déjà pris',
+        'username_password_required': 'Nom d’utilisateur et mot de passe requis',
+        'account_changes_require_login': 'Veuillez vous connecter pour modifier le compte',
         'greeting': 'Bienvenue,',
         'logout': 'Déconnexion'
     }
@@ -410,7 +464,10 @@ function applyTranslations() {
         const key = el.getAttribute('data-i18n');
         if (!key) return;
         const txt = (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || TRANSLATIONS['tr'][key] || el.textContent;
-        el.textContent = txt;
+        // if it's an <option> or input placeholder, set appropriately
+        if (el.tagName.toLowerCase() === 'option') el.textContent = txt;
+        else if (el.tagName.toLowerCase() === 'input' && el.type === 'text') el.placeholder = txt;
+        else el.textContent = txt;
     });
 }
 
@@ -418,7 +475,9 @@ function applyTheme() {
     const settings = JSON.parse(localStorage.getItem('dukkan_settings') || '{}');
     const theme = settings.theme || 'light';
     document.body.classList.remove('theme-soft');
-    if (theme === 'soft') document.body.classList.add('theme-soft');
+    document.body.classList.remove('theme-dark');
+    // apply either dark or leave light (default)
+    if (theme === 'dark') document.body.classList.add('theme-dark');
 }
 
 function updateAuthUI() {
@@ -461,7 +520,7 @@ if (saveAccountBtn) {
         e.preventDefault();
         const user = getCurrentUser();
         if (!user) {
-            alert('Hesap değişiklikleri için giriş yapın');
+            alert(t('account_changes_require_login'));
             return;
         }
         const display = document.getElementById('setDisplay').value.trim();
@@ -472,7 +531,7 @@ if (saveAccountBtn) {
         if (display) users[idx].display = display;
         if (newPass) users[idx].password = newPass;
         saveUsers(users);
-        alert('Hesap ayarları kaydedildi');
+        alert(t('account_saved'));
         updateAuthUI();
     });
 }
@@ -489,7 +548,7 @@ if (saveInterfaceBtn) {
         applyTranslations();
         applyTheme();
         updateAuthUI();
-        alert('Arayüz ve dil ayarlarınız kaydedildi');
+        alert(t('settings_saved'));
     });
 }
 
