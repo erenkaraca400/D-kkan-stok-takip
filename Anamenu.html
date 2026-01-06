@@ -1,14 +1,49 @@
-<nav class="subscription-bar">
-    <div class="sub-inner">
-        <div class="site-logo">
-            <a href="index.html" style="text-decoration: none; font-weight: bold; color: var(--secondary);">Eren Stok Takip</a>
-        </div>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ana Menü | Eren Stok Takip</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="subscription-bar">
+            <div class="sub-inner">
+                <div class="site-logo">
+                    <a href="index.html" style="text-decoration: none; font-weight: bold; color: var(--secondary); font-size: 18px;">📦 ErenStok</a>
+                </div>
+                
+                <div class="auth-actions">
+                    <a href="login.html" class="btn-nav">Giriş Yap</a>
+                    <a href="signup.html" class="btn-nav btn-highlight">Katıl Yap</a>
+                    <a href="settings.html" class="btn-nav" title="Ayarlar">⚙️</a>
+                    <span class="sub-status">Abonelik: Standart</span>
+                </div>
+            </div>
+        </nav>
 
-        <div class="auth-actions">
-            <a href="login.html" class="btn-nav" data-i18n="nav.login">Giriş Yap</a>
-            <a href="signup.html" class="btn-nav btn-highlight" data-i18n="nav.signup">Katıl Yap</a>
-            <a href="settings.html" class="btn-nav" title="Ayarlar">⚙️</a>
-            <span class="sub-status" data-i18n="nav.sub_status">Abonelik: Standart</span>
-        </div>
+        <header class="header">
+            <h1>Ana Menü</h1>
+            <p class="subtitle">Yapmak istediğiniz işlemi seçin</p>
+        </header>
+
+        <main class="main-content">
+            <div style="text-align: center; padding: 50px;">
+                <p>Menü içeriği buraya gelecek...</p>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>© 2026 Eren Stok Takip</p>
+        </footer>
     </div>
-</nav>
+
+    <script>
+        const saved = JSON.parse(localStorage.getItem('dukkan_settings') || '{}');
+        if (saved.theme === 'dark') {
+            document.body.classList.add('theme-dark');
+        }
+    </script>
+</body>
+</html>
