@@ -78,7 +78,7 @@ body {
     gap: 10px;
 }
 
-/* Softer / flexible left/sidebar and header styles */
+/* Daha yumuşak/esnek sol/yan çubuk ve başlık stilleri */
 .auth-actions a, .auth-actions button {
     border-radius: 8px;
     padding: 8px 12px;
@@ -92,12 +92,14 @@ body {
     border: 2px solid rgba(255,255,255,0.85);
 }
 
-/* small avatar variant in header when light theme */
+
+/* Açık tema kullanıldığında başlıkta küçük avatar varyantı */
 body:not(.theme-dark) .auth-avatar { border-color: rgba(0,0,0,0.08); }
 
 aside .form-section {
     background: transparent;
     padding: 8px;
+    
 }
 
 aside nav ul li a {
@@ -167,11 +169,12 @@ input, select, textarea {
 }
 
 /* BUTTONS */
-.btn {
-    padding: 10px 16px;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
+button {
+  background-color: #007bff; /* Canlı mavi */
+  color: white; /* Yazı rengi mutlaka zıt olsun */
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
 }
 
 .btn-add {
@@ -261,7 +264,8 @@ input, select, textarea {
     font-size: 14px;
 }
 
-/* Dark theme */
+
+/* Koyu tema */
 .theme-dark {
     --primary: #1f4b6a;
     --secondary: #0b2b3a;
