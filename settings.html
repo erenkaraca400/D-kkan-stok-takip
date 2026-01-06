@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ayarlar</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>⚙️ Ayarlar</h1>
+            <p class="subtitle">Hesap bilgilerinizi güncelleyin</p>
+        </header>
+
+        <main class="main-content">
+            <section class="form-section">
+                <h2>Hesap Bilgileri</h2>
+                <p>Kullanıcı: <strong id="settingsUsername">Yükleniyor...</strong></p>
+
+                <form id="settingsForm">
+                    <div class="form-group">
+                        <label>Görünen İsim</label>
+                        <input type="text" id="setDisplay" placeholder="Görünen ismi girin">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Yeni Şifre (isteğe bağlı)</label>
+                        <input type="password" id="setPassword" placeholder="Yeni şifre">
+                    </div>
+
+                    <button class="btn btn-add">Kaydet</button>
+                    <a class="btn btn-clear" href="index.html">← Ana Sayfaya Dön</a>
+                </form>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>© 2026 Dükkan Mal Takip Sistemi</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof getCurrentUser !== 'function') return;
+            const user = getCurrentUser();
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            const display = document.getElementById('setDisplay');
+            const username = document.getElementById('settingsUsername');
+            if (username) username.textContent = user.username;
+            if (display) display.value = user.display || user.username;
+        });
+    </script>
+</body>
+
+</html>

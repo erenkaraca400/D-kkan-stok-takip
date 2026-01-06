@@ -155,23 +155,8 @@ if (deleteAllBtn) {
 }
 
 /***********************
- * CLEAR (FORM + SEARCH) - now removes selected if any
+ * CLEAR removed per request
  ***********************/
-const clearBtn = document.getElementById("clearBtn");
-if (clearBtn) {
-    clearBtn.addEventListener("click", () => {
-        if (selectedProductId) {
-            if (!confirm("Seçili ürünü silmek istiyor musun?")) return;
-            deleteProductById(selectedProductId);
-            return;
-        }
-        const si = document.getElementById("searchInput");
-        const fc = document.getElementById("filterCategory");
-        if (si) si.value = "";
-        if (fc) fc.value = "";
-        renderProducts(products);
-    });
-}
 
 /***********************
  * SEARCH + FILTER
@@ -280,10 +265,35 @@ function updateAuthUI() {
             <span>Hoşgeldiniz, <strong>${user.display || user.username}</strong></span>
             <button id="logoutBtn" class="btn btn-clear">Çıkış</button>
             <a href="subscription.html" class="btn btn-clear">Abonelikler</a>
+            <a href="settings.html" class="btn btn-clear">Ayarlar</a>
         `;
         const lb = document.getElementById('logoutBtn');
-        lb.addEventListener('click', logout);
+        if (lb) lb.addEventListener('click', logout);
     }
+}
+
+// SETTINGS handler
+const settingsForm = document.getElementById('settingsForm');
+if (settingsForm) {
+    settingsForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const display = document.getElementById('setDisplay').value.trim();
+        const newPass = document.getElementById('setPassword').value;
+        const user = getCurrentUser();
+        if (!user) {
+            alert('Giriş yapmalısınız');
+            window.location.href = 'login.html';
+            return;
+        }
+        const users = getUsers();
+        const idx = users.findIndex(u => u.username === user.username);
+        if (idx === -1) return;
+        if (display) users[idx].display = display;
+        if (newPass) users[idx].password = newPass;
+        saveUsers(users);
+        alert('Ayarlar kaydedildi');
+        updateAuthUI();
+    });
 }
 
 // load package info on index header if present
