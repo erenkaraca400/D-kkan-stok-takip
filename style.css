@@ -367,6 +367,79 @@ input, select, textarea {
     background-color: #0b1220 !important;
     border-color: #22303b !important;
 }
+/* Üst Bar Genel Yapısı */
+.subscription-bar {
+    background: #f1f1f1;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.theme-dark .subscription-bar {
+    background: #0b1220 !important; /* Koyu tema arka planı */
+    border-color: #22303b;
+}
+
+.sub-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.auth-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Navigasyon Butonları */
+.btn-nav {
+    text-decoration: none;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background: rgba(0,0,0,0.05);
+}
+
+/* Katıl Yap Butonu (Öne Çıkan) */
+.btn-highlight {
+    background: var(--primary) !important;
+    color: white !important;
+}
+
+/* KOYU TEMA DÜZENLEMESİ (Senin istediğin parlaklık) */
+.theme-dark .btn-nav {
+    color: #e6eef8;
+    background: rgba(255,255,255,0.1);
+}
+
+.theme-dark .btn-highlight {
+    background: #00d1b2 !important; /* Parlak Turkuaz */
+    color: #000 !important;          /* Siyah yazı */
+    box-shadow: 0 0 10px rgba(0, 209, 178, 0.4);
+}
+
+.btn-nav:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+/* Mobil Görünüm */
+@media (max-width: 600px) {
+    .sub-inner {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .auth-actions {
+        width: 100%;
+        justify-content: center;
+        font-size: 12px;
+    }
+}
 
 
 
