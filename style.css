@@ -130,6 +130,25 @@ input, select, textarea {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 18px;
 }
+.product {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    cursor: pointer;
+    background: white;
+    transition: box-shadow .15s ease, transform .08s ease;
+}
+
+.product:hover {
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+}
+
+.product.selected {
+    outline: 3px solid rgba(255,107,53,0.2);
+    box-shadow: 0 8px 26px rgba(255,107,53,0.08);
+}
+
 
 .product-card {
     border: 1px solid var(--border);
