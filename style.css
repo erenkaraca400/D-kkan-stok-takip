@@ -324,6 +324,49 @@ input, select, textarea {
     opacity: 0.6;
 }
 /* -------------------------------------------------- */
+/* KOYU TEMA ÖZEL DÜZELTMELERİ */
+
+.theme-dark {
+    /* Index sayfasındaki beyaz arka plan sorununu çözer */
+    --bg: #0b1220 !important; 
+}
+
+/* 1. Soldaki Ayarlar Menüsü Linkleri */
+.theme-dark aside nav ul li a {
+    background: rgba(0, 209, 178, 0.1) !important; /* Çok hafif turkuaz arka plan */
+    color: #00d1b2 !important;                  /* Parlak turkuaz yazı */
+    border: 1px solid rgba(0, 209, 178, 0.3);    /* İnce belirgin kenarlık */
+}
+
+.theme-dark aside nav ul li a:hover {
+    background: #00d1b2 !important;              /* Üstüne gelince tam parlasın */
+    color: #000 !important;                      /* Yazı siyah olsun */
+}
+
+/* 2. Index Sayfası ve Genel Butonlar */
+.theme-dark button, 
+.theme-dark .btn, 
+.theme-dark .global-save,
+.theme-dark .btn-add {
+    background-color: #00d1b2 !important;        /* Tuşlar parlak turkuaz */
+    color: #000 !important;                      /* Yazı siyah (okunması için) */
+    box-shadow: 0 4px 12px rgba(0, 209, 178, 0.4) !important;
+}
+
+/* 3. Arka Plan Siyahlığı (Index ve İçerik Alanları) */
+.theme-dark .container,
+.theme-dark .form-section,
+.theme-dark .main-content {
+    background-color: #07121a !important;        /* Tam siyah/koyu lacivert */
+    color: #e6eef8 !important;
+}
+
+/* Index sayfasındaki butonların olduğu bölüm beyaz kalmasın */
+.theme-dark .subscription-bar,
+.theme-dark .search-section {
+    background-color: #0b1220 !important;
+    border-color: #22303b !important;
+}
 
 
 
