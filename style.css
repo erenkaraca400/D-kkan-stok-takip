@@ -1,3 +1,19 @@
+/* Her şeyin kutu içine hapsolmasını sağlar */
+* {
+  box-sizing: border-box;
+}
+
+/* Resimler asla ekrandan taşmaz */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Videolar ve diğer objeler taşmaz */
+video, canvas, iframe {
+  max-width: 100%;
+}
+
 /* RESET */
 * {
     margin: 0;
