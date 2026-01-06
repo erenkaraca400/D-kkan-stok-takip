@@ -76,15 +76,20 @@ function renderProducts(list) {
     if (!list || list.length === 0) {
         container.innerHTML = "<p>Ürün yok</p>";
         updateStats();
+        updateCriticalList();
         return;
     }
 
     list.forEach((p) => {
+        const isCritical = Number(p.quantity) < 5;
         const div = document.createElement("div");
         div.className = "product" + (selectedProductId === p.id ? " selected" : "");
         div.dataset.id = p.id;
         div.innerHTML = `
-            <strong>${p.name}</strong><br>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong>${p.name}</strong>
+                <span class="badge ${isCritical ? 'crit-badge' : 'ok-badge'}">${isCritical ? t('critical.label') : t('ok.label')}</span>
+            </div>
             Kategori: ${p.category}<br>
             Miktar: ${p.quantity}<br>
             Fiyat: ₺${p.price}<br><br>
@@ -104,7 +109,8 @@ function renderProducts(list) {
     });
 
     updateStats();
-}
+    updateCriticalList();
+} 
 
 /***********************
  * STATS
@@ -119,6 +125,27 @@ function updateStats() {
     if (totalStockEl) totalStockEl.textContent = totalStock;
     const totalValue = products.reduce((s, p) => s + (Number(p.quantity || 0) * Number(p.price || 0)), 0);
     if (totalValueEl) totalValueEl.textContent = '₺' + totalValue.toFixed(2);
+}
+
+function updateCriticalList() {
+    const el = document.getElementById('criticalList');
+    if (!el) return;
+    el.innerHTML = '';
+    if (!products || products.length === 0) {
+        el.innerHTML = `<p class="empty-message">${t('critical.none')}</p>`;
+        return;
+    }
+    // show critical items first
+    const list = [...products].sort((a,b) => (Number(b.quantity < 5) - Number(a.quantity < 5)));
+    list.forEach(p => {
+        const isCritical = Number(p.quantity) < 5;
+        const item = document.createElement('div');
+        item.className = 'critical-item' + (isCritical ? ' critical' : ' ok');
+        item.dataset.id = p.id;
+        item.innerHTML = `<strong>${p.name}</strong> <small style="opacity:.9">(${p.quantity})</small>`;
+        item.addEventListener('click', () => selectProduct(p.id));
+        el.appendChild(item);
+    });
 }
 
 /***********************
@@ -363,6 +390,10 @@ const TRANSLATIONS = {
         'confirm_delete_product': 'Bu ürünü silmek istiyor musunuz?',
         'delete_all_confirm': 'Tüm ürünler silinsin mi?',
         'product_deleted': 'Ürün silindi',
+        'critical.title': 'Kritik',
+        'critical.none': 'Kritik ürün yok',
+        'critical.label': 'Kritik',
+        'ok.label': 'Tamam',
         'login_wrong': 'Kullanıcı adı veya şifre yanlış',
         'signup_user_taken': 'Bu kullanıcı adı zaten alınmış',
         'username_password_required': 'Kullanıcı adı ve şifre gerekli',
@@ -414,6 +445,10 @@ const TRANSLATIONS = {
         'confirm_delete_product': 'Are you sure you want to delete this product?',
         'delete_all_confirm': 'Delete ALL products?',
         'product_deleted': 'Product deleted',
+        'critical.title': 'Critical',
+        'critical.none': 'No critical products',
+        'critical.label': 'Critical',
+        'ok.label': 'OK',
         'login_wrong': 'Username or password is incorrect',
         'signup_user_taken': 'That username is already taken',
         'username_password_required': 'Username and password are required',
@@ -465,6 +500,10 @@ const TRANSLATIONS = {
         'confirm_delete_product': '¿Seguro que quieres eliminar este producto?',
         'delete_all_confirm': '¿Eliminar TODOS los productos?',
         'product_deleted': 'Producto eliminado',
+        'critical.title': 'Crítico',
+        'critical.none': 'No hay productos críticos',
+        'critical.label': 'Crítico',
+        'ok.label': 'Bien',
         'login_wrong': 'Usuario o contraseña incorrectos',
         'signup_user_taken': 'Ese nombre de usuario ya existe',
         'username_password_required': 'Usuario y contraseña requeridos',
@@ -516,6 +555,10 @@ const TRANSLATIONS = {
         'confirm_delete_product': 'Voulez-vous vraiment supprimer ce produit ?',
         'delete_all_confirm': 'Supprimer TOUS les produits ?',
         'product_deleted': 'Produit supprimé',
+        'critical.title': 'Critique',
+        'critical.none': 'Aucun produit critique',
+        'critical.label': 'Critique',
+        'ok.label': 'OK',
         'login_wrong': 'Nom d’utilisateur ou mot de passe incorrect',
         'signup_user_taken': 'Ce nom d’utilisateur est déjà pris',
         'username_password_required': 'Nom d’utilisateur et mot de passe requis',
