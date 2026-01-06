@@ -306,6 +306,24 @@ input, select, textarea {
   }
 }
  
+/* --- SADECE BU KISMI CSS DOSYANIN EN ALTINA EKLE --- */
+
+/* Koyu tema seçildiğinde butonları belirginleştir */
+.theme-dark .btn-add, 
+.theme-dark .global-save,
+.theme-dark button {
+    background-color: #00d1b2 !important; /* Canlı turkuaz (veya istediğin parlak bir renk) */
+    color: #000000 !important;           /* Yazı net okunması için siyah */
+    box-shadow: 0 0 12px rgba(0, 209, 178, 0.4); /* Hafif parlama efekti */
+}
+
+/* Koyu temada pasif (disabled) butonlar çok sönük kalmasın */
+.theme-dark button:disabled {
+    background-color: #334455 !important;
+    color: #8899aa !important;
+    opacity: 0.6;
+}
+/* -------------------------------------------------- */
 
 
 
