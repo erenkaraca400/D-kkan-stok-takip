@@ -91,6 +91,7 @@ input, select, textarea {
     padding: 10px;
     border-radius: 8px;
     border: 2px solid var(--border);
+    background: #fff;
 }
 
 /* BUTTONS */

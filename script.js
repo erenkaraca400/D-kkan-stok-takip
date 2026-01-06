@@ -272,27 +272,46 @@ function updateAuthUI() {
     }
 }
 
-// SETTINGS handler
+// SETTINGS handler (account save)
 const settingsForm = document.getElementById('settingsForm');
 if (settingsForm) {
     settingsForm.addEventListener('submit', (e) => {
+        // we handle account saves via saveAccount button; prevent default to be safe
         e.preventDefault();
-        const display = document.getElementById('setDisplay').value.trim();
-        const newPass = document.getElementById('setPassword').value;
+    });
+}
+const saveAccountBtn = document.getElementById('saveAccount');
+if (saveAccountBtn) {
+    saveAccountBtn.addEventListener('click', (e) => {
+        e.preventDefault();
         const user = getCurrentUser();
         if (!user) {
-            alert('Giriş yapmalısınız');
-            window.location.href = 'login.html';
+            alert('Hesap değişiklikleri için giriş yapın');
             return;
         }
+        const display = document.getElementById('setDisplay').value.trim();
+        const newPass = document.getElementById('setPassword').value;
         const users = getUsers();
         const idx = users.findIndex(u => u.username === user.username);
         if (idx === -1) return;
         if (display) users[idx].display = display;
         if (newPass) users[idx].password = newPass;
         saveUsers(users);
-        alert('Ayarlar kaydedildi');
+        alert('Hesap ayarları kaydedildi');
         updateAuthUI();
+    });
+}
+
+// Interface / Language saves
+const saveInterfaceBtn = document.getElementById('saveInterface');
+if (saveInterfaceBtn) {
+    saveInterfaceBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const lang = document.getElementById('uiLanguage').value;
+        const theme = document.getElementById('uiTheme').value;
+        const settings = { language: lang, theme };
+        localStorage.setItem('dukkan_settings', JSON.stringify(settings));
+        alert('Arayüz ve dil ayarlarınız kaydedildi');
     });
 }
 
