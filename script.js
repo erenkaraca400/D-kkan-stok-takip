@@ -36,6 +36,16 @@ function saveProducts() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
 }
 
+// helper: read File object as Data URL (base64)
+function readFileAsDataURL(file) {
+    return new Promise((resolve, reject) => {
+        const fr = new FileReader();
+        fr.onload = () => resolve(fr.result);
+        fr.onerror = reject;
+        fr.readAsDataURL(file);
+    });
+}
+
 /***********************
  * RENDER
  ***********************/
@@ -194,7 +204,7 @@ function saveUsers(u) {
 // Signup handler (if page has signup form)
 const signupForm = document.getElementById('signupForm');
 if (signupForm) {
-    signupForm.addEventListener('submit', (e) => {
+    signupForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const username = document.getElementById('suUsername').value.trim();
         const password = document.getElementById('suPassword').value;
@@ -208,7 +218,19 @@ if (signupForm) {
             alert(t('signup_user_taken'));
             return;
         }
-        users.push({username, password, display});
+        // handle avatar file if provided
+        const avatarInput = document.getElementById('suAvatar');
+        let avatarData = null;
+        if (avatarInput && avatarInput.files && avatarInput.files[0]) {
+            try {
+                avatarData = await readFileAsDataURL(avatarInput.files[0]);
+            } catch (err) {
+                console.warn('Avatar load failed', err);
+            }
+        }
+        const newUser = {username, password, display};
+        if (avatarData) newUser.avatar = avatarData;
+        users.push(newUser);
         saveUsers(users);
         localStorage.setItem(CURRENT_USER_KEY, username);
         // set default package
@@ -216,6 +238,17 @@ if (signupForm) {
             localStorage.setItem('dukkan_package', JSON.stringify({name: 'Ücretsiz', limit: 100}));
         }
         window.location.href = 'index.html';
+    });
+}
+
+// signup avatar preview setup
+const suAvatarInput = document.getElementById('suAvatar');
+const suAvatarPreview = document.getElementById('suAvatarPreview');
+if (suAvatarInput && suAvatarPreview) {
+    suAvatarInput.addEventListener('change', (e) => {
+        const f = e.target.files && e.target.files[0];
+        if (f) suAvatarPreview.src = URL.createObjectURL(f);
+        else suAvatarPreview.src = '';
     });
 }
 
@@ -288,6 +321,8 @@ const TRANSLATIONS = {
         'settings.accountNote': 'Giriş yapmadan sadece görüntülenen ismi değiştiremezsiniz. Lütfen giriş yapın.',
         'settings.displayLabel': 'Görünen İsim',
         'settings.passwordLabel': 'Yeni Şifre (isteğe bağlı)',
+        'settings.avatarLabel': 'Profil Resmi',
+        'remove_avatar': 'Resmi Kaldır',
         'settings.interface': 'Arayüz',
         'settings.interfaceNote': 'Ayarlarınızı kişiselleştirin (Karanlık tema yok — siyah yapma isteğine göre açık tutuldu).',
         'settings.themeLabel': 'Temayı Seç',
@@ -336,6 +371,8 @@ const TRANSLATIONS = {
         'settings.accountNote': 'You must be signed in to change display name.',
         'settings.displayLabel': 'Display Name',
         'settings.passwordLabel': 'New Password (optional)',
+        'settings.avatarLabel': 'Profile Image',
+        'remove_avatar': 'Remove Image',
         'settings.interface': 'Interface',
         'settings.interfaceNote': 'Customize your interface (no dark/black theme).',
         'settings.themeLabel': 'Choose theme',
@@ -383,6 +420,8 @@ const TRANSLATIONS = {
         'settings.accountNote': 'Debe iniciar sesión para cambiar el nombre visible.',
         'settings.displayLabel': 'Nombre Visible',
         'settings.passwordLabel': 'Nueva Contraseña (opcional)',
+        'settings.avatarLabel': 'Imagen de Perfil',
+        'remove_avatar': 'Eliminar imagen',
         'settings.interface': 'Interfaz',
         'settings.interfaceNote': 'Personaliza tu interfaz (sin tema negro).',
         'settings.themeLabel': 'Seleccionar tema',
@@ -430,6 +469,8 @@ const TRANSLATIONS = {
         'settings.accountNote': 'Vous devez être connecté pour changer le nom affiché.',
         'settings.displayLabel': "Nom d'affichage",
         'settings.passwordLabel': 'Nouveau mot de passe (optionnel)',
+        'settings.avatarLabel': 'Image de profil',
+        'remove_avatar': 'Supprimer l\'image',
         'settings.interface': 'Interface',
         'settings.interfaceNote': "Personnalisez l'interface (pas de thème noir).",
         'settings.themeLabel': 'Choisir le thème',
@@ -486,10 +527,13 @@ function updateAuthUI() {
     const user = getCurrentUser();
     if (user) {
         authActions.innerHTML = `
-            <span>${t('greeting')} <strong>${user.display || user.username}</strong></span>
-            <button id="logoutBtn" class="btn btn-clear">${t('logout')}</button>
-            <a href="subscription.html" class="btn btn-clear">${t('nav.subs')}</a>
-            <a href="settings.html" class="btn btn-clear">${t('nav.settings')}</a>
+            <div style="display:flex; align-items:center; gap:10px;">
+                ${user.avatar ? `<img src="${user.avatar}" class="auth-avatar">` : ''}
+                <span>${t('greeting')} <strong>${user.display || user.username}</strong></span>
+                <button id="logoutBtn" class="btn btn-clear">${t('logout')}</button>
+                <a href="subscription.html" class="btn btn-clear">${t('nav.subs')}</a>
+                <a href="settings.html" class="btn btn-clear">${t('nav.settings')}</a>
+            </div>
         `;
         const lb = document.getElementById('logoutBtn');
         if (lb) lb.addEventListener('click', logout);
@@ -539,7 +583,7 @@ if (saveAccountBtn) {
 // Global save button (saves interface + account if available)
 const globalSaveBtn = document.getElementById('globalSave');
 if (globalSaveBtn) {
-    globalSaveBtn.addEventListener('click', (e) => {
+    globalSaveBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         // save interface/language
         const langEl = document.getElementById('uiLanguage');
@@ -558,6 +602,8 @@ if (globalSaveBtn) {
         if (user) {
             const displayEl = document.getElementById('setDisplay');
             const passEl = document.getElementById('setPassword');
+            const avatarInput = document.getElementById('setAvatar');
+            const avatarPreview = document.getElementById('setAvatarPreview');
             const display = displayEl ? displayEl.value.trim() : '';
             const newPass = passEl ? passEl.value : '';
             const users = getUsers();
@@ -565,6 +611,16 @@ if (globalSaveBtn) {
             if (idx !== -1) {
                 if (display) { users[idx].display = display; accountChanged = true; }
                 if (newPass) { users[idx].password = newPass; accountChanged = true; }
+                // handle avatar changes: remove flag or file
+                if (avatarPreview && avatarPreview.dataset && avatarPreview.dataset.remove === '1') {
+                    if (users[idx].avatar) { delete users[idx].avatar; accountChanged = true; }
+                } else if (avatarInput && avatarInput.files && avatarInput.files[0]) {
+                    try {
+                        const data = await readFileAsDataURL(avatarInput.files[0]);
+                        users[idx].avatar = data;
+                        accountChanged = true;
+                    } catch (err) { console.warn('avatar save failed', err); }
+                }
                 if (accountChanged) {
                     saveUsers(users);
                     // clear password field after saving

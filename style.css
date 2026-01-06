@@ -68,6 +68,17 @@ body {
     padding: 8px 12px;
 }
 
+.auth-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255,255,255,0.85);
+}
+
+/* small avatar variant in header when light theme */
+body:not(.theme-dark) .auth-avatar { border-color: rgba(0,0,0,0.08); }
+
 aside .form-section {
     background: transparent;
     padding: 8px;
