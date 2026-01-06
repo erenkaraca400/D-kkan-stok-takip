@@ -256,19 +256,194 @@ function logout() {
     window.location.href = 'index.html';
 }
 
+// TRANSLATIONS: simple key-value map for a few UI strings
+const TRANSLATIONS = {
+    tr: {
+        'nav.title': '🏪 Dükkan Mal Takip Sistemi',
+        'nav.subtitle': 'Envanterinizi Kolayca Yönetin',
+        'nav.login': 'Giriş Yap',
+        'nav.signup': 'Katıl',
+        'nav.subs': 'Abonelikler',
+        'nav.settings': 'Ayarlar',
+        'nav.home': '← Ana Sayfaya Dön',
+        'nav.subLabel': 'Abonelik:',
+        'nav.weekly': 'Haftalık Kalan:',
+        'products.add': 'Yeni Ürün Ekle',
+        'login.title': '🔐 Giriş Yap',
+        'login.subtitle': 'Hesabınıza giriş yapın',
+        'signup.title': '📝 Yeni Hesap Oluştur',
+        'signup.subtitle': 'Ücretsiz pakete başlayın',
+        'btn.login': 'Giriş Yap',
+        'btn.signup': 'Hesap Oluştur',
+        'settings.title': '⚙️ Ayarlar',
+        'settings.subtitle': 'Hesap bilgilerinizi güncelleyin',
+        'settings.account': 'Hesap',
+        'settings.language': 'Dil',
+        'settings.userLabel': 'Kullanıcı:',
+        'settings.accountNote': 'Giriş yapmadan sadece görüntülenen ismi değiştiremezsiniz. Lütfen giriş yapın.',
+        'settings.displayLabel': 'Görünen İsim',
+        'settings.passwordLabel': 'Yeni Şifre (isteğe bağlı)',
+        'settings.interface': 'Arayüz',
+        'settings.interfaceNote': 'Ayarlarınızı kişiselleştirin (Karanlık tema yok — siyah yapma isteğine göre açık tutuldu).',
+        'settings.themeLabel': 'Temayı Seç',
+        'theme.light': 'Açık (varsayılan)',
+        'theme.soft': 'Yumuşak',
+        'save': 'Kaydet',
+        'greeting': 'Hoşgeldiniz,',
+        'logout': 'Çıkış'
+    },
+    en: {
+        'nav.title': '🏪 Shop Inventory',
+        'nav.subtitle': 'Manage your inventory easily',
+        'nav.login': 'Login',
+        'nav.signup': 'Sign Up',
+        'nav.subs': 'Subscriptions',
+        'nav.settings': 'Settings',
+        'nav.home': '← Back to Home',
+        'nav.subLabel': 'Subscription:',
+        'nav.weekly': 'Weekly Remaining:',
+        'products.add': 'Add New Product',
+        'login.title': '🔐 Login',
+        'login.subtitle': 'Sign in to your account',
+        'signup.title': '📝 Create Account',
+        'signup.subtitle': 'Start with the free plan',
+        'btn.login': 'Login',
+        'btn.signup': 'Create Account',
+        'settings.title': '⚙️ Settings',
+        'settings.subtitle': 'Update your account',
+        'settings.account': 'Account',
+        'settings.language': 'Language',
+        'settings.userLabel': 'User:',
+        'settings.accountNote': 'You must be signed in to change display name.',
+        'settings.displayLabel': 'Display Name',
+        'settings.passwordLabel': 'New Password (optional)',
+        'settings.interface': 'Interface',
+        'settings.interfaceNote': 'Customize your interface (no dark/black theme).',
+        'settings.themeLabel': 'Choose theme',
+        'theme.light': 'Light (default)',
+        'theme.soft': 'Soft',
+        'save': 'Save',
+        'greeting': 'Welcome,',
+        'logout': 'Logout'
+    },
+    es: {
+        'nav.title': '🏪 Inventario de Tienda',
+        'nav.subtitle': 'Administra tu inventario fácilmente',
+        'nav.login': 'Iniciar Sesión',
+        'nav.signup': 'Registrarse',
+        'nav.subs': 'Suscripciones',
+        'nav.settings': 'Ajustes',
+        'nav.home': '← Volver al Inicio',
+        'nav.subLabel': 'Suscripción:',
+        'nav.weekly': 'Restante Semanal:',
+        'products.add': 'Agregar Producto',
+        'login.title': '🔐 Iniciar Sesión',
+        'login.subtitle': 'Ingrese a su cuenta',
+        'signup.title': '📝 Crear Cuenta',
+        'signup.subtitle': 'Comience con el plan gratuito',
+        'btn.login': 'Ingresar',
+        'btn.signup': 'Crear Cuenta',
+        'settings.title': '⚙️ Ajustes',
+        'settings.subtitle': 'Actualiza tu cuenta',
+        'settings.account': 'Cuenta',
+        'settings.language': 'Idioma',
+        'settings.userLabel': 'Usuario:',
+        'settings.accountNote': 'Debe iniciar sesión para cambiar el nombre visible.',
+        'settings.displayLabel': 'Nombre Visible',
+        'settings.passwordLabel': 'Nueva Contraseña (opcional)',
+        'settings.interface': 'Interfaz',
+        'settings.interfaceNote': 'Personaliza tu interfaz (sin tema negro).',
+        'settings.themeLabel': 'Seleccionar tema',
+        'theme.light': 'Claro (predeterminado)',
+        'theme.soft': 'Suave',
+        'save': 'Guardar',
+        'greeting': 'Bienvenido,',
+        'logout': 'Cerrar Sesión'
+    },
+    fr: {
+        'nav.title': '🏪 Gestion de Stock',
+        'nav.subtitle': 'Gérez votre inventaire facilement',
+        'nav.login': 'Connexion',
+        'nav.signup': 'S’inscrire',
+        'nav.subs': 'Abonnements',
+        'nav.settings': 'Paramètres',
+        'nav.home': '← Retour à l’accueil',
+        'nav.subLabel': 'Abonnement:',
+        'nav.weekly': 'Restant Hebdomadaire:',
+        'products.add': 'Ajouter un produit',
+        'login.title': '🔐 Connexion',
+        'login.subtitle': 'Connectez-vous à votre compte',
+        'signup.title': '📝 Créer un compte',
+        'signup.subtitle': 'Commencez avec le forfait gratuit',
+        'btn.login': 'Connexion',
+        'btn.signup': 'Créer un compte',
+        'settings.title': '⚙️ Paramètres',
+        'settings.subtitle': 'Mettez à jour votre compte',
+        'settings.account': 'Compte',
+        'settings.language': 'Langue',
+        'settings.userLabel': 'Utilisateur:',
+        'settings.accountNote': 'Vous devez être connecté pour changer le nom affiché.',
+        'settings.displayLabel': "Nom d'affichage",
+        'settings.passwordLabel': 'Nouveau mot de passe (optionnel)',
+        'settings.interface': 'Interface',
+        'settings.interfaceNote': "Personnalisez l'interface (pas de thème noir).",
+        'settings.themeLabel': 'Choisir le thème',
+        'theme.light': 'Clair (par défaut)',
+        'theme.soft': 'Doux',
+        'save': 'Enregistrer',
+        'greeting': 'Bienvenue,',
+        'logout': 'Déconnexion'
+    }
+};
+
+function t(key) {
+    const settings = JSON.parse(localStorage.getItem('dukkan_settings') || '{}');
+    const lang = settings.language || 'tr';
+    const tr = TRANSLATIONS[lang] || TRANSLATIONS['tr'];
+    return (tr && tr[key]) ? tr[key] : key;
+}
+
+function applyTranslations() {
+    const settings = JSON.parse(localStorage.getItem('dukkan_settings') || '{}');
+    const lang = settings.language || 'tr';
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (!key) return;
+        const txt = (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || TRANSLATIONS['tr'][key] || el.textContent;
+        el.textContent = txt;
+    });
+}
+
+function applyTheme() {
+    const settings = JSON.parse(localStorage.getItem('dukkan_settings') || '{}');
+    const theme = settings.theme || 'light';
+    document.body.classList.remove('theme-soft');
+    if (theme === 'soft') document.body.classList.add('theme-soft');
+}
+
 function updateAuthUI() {
     const authActions = document.querySelector('.auth-actions');
     if (!authActions) return;
     const user = getCurrentUser();
     if (user) {
         authActions.innerHTML = `
-            <span>Hoşgeldiniz, <strong>${user.display || user.username}</strong></span>
-            <button id="logoutBtn" class="btn btn-clear">Çıkış</button>
-            <a href="subscription.html" class="btn btn-clear">Abonelikler</a>
-            <a href="settings.html" class="btn btn-clear">Ayarlar</a>
+            <span>${t('greeting')} <strong>${user.display || user.username}</strong></span>
+            <button id="logoutBtn" class="btn btn-clear">${t('logout')}</button>
+            <a href="subscription.html" class="btn btn-clear">${t('nav.subs')}</a>
+            <a href="settings.html" class="btn btn-clear">${t('nav.settings')}</a>
         `;
         const lb = document.getElementById('logoutBtn');
         if (lb) lb.addEventListener('click', logout);
+    } else {
+        // ensure the logged-out labels are translated in DOM too (for static anchors)
+        const loginLink = document.querySelector('a[href="login.html"]');
+        const signupLink = document.querySelector('a[href="signup.html"]');
+        const subsLink = document.querySelector('a[href="subscription.html"]');
+        const settingsLink = document.querySelector('a[href="settings.html"]');
+        if (loginLink) loginLink.textContent = t('nav.login');
+        if (signupLink) signupLink.textContent = t('nav.signup');
+        if (subsLink) subsLink.textContent = t('nav.subs');
+        if (settingsLink) settingsLink.textContent = t('nav.settings');
     }
 }
 
@@ -311,6 +486,9 @@ if (saveInterfaceBtn) {
         const theme = document.getElementById('uiTheme').value;
         const settings = { language: lang, theme };
         localStorage.setItem('dukkan_settings', JSON.stringify(settings));
+        applyTranslations();
+        applyTheme();
+        updateAuthUI();
         alert('Arayüz ve dil ayarlarınız kaydedildi');
     });
 }
@@ -334,6 +512,13 @@ function loadPackageHeader() {
 /***********************
  * INIT
  ***********************/
+applyTranslations();
+applyTheme();
 updateAuthUI();
 loadPackageHeader();
 renderProducts(products);
+
+document.addEventListener('DOMContentLoaded', () => {
+    applyTranslations();
+    applyTheme();
+});
