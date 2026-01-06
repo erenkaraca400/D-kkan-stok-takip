@@ -46,6 +46,26 @@ function readFileAsDataURL(file) {
     });
 }
 
+// small hash helper and random avatar generator (SVG data URI)
+function hashCode(str) {
+    let h = 0;
+    for (let i = 0; i < str.length; i++) {
+        h = ((h << 5) - h) + str.charCodeAt(i);
+        h |= 0;
+    }
+    return h;
+}
+function generateRandomAvatar(seed) {
+    // colors palette
+    const colors = ['#EF9A9A','#F48FB1','#CE93D8','#9FA8DA','#81D4FA','#80DEEA','#A5D6A7','#E6EE9C','#FFCC80','#BCAAA4'];
+    const s = (seed || Math.random().toString(36));
+    const idx = Math.abs(hashCode(s + Date.now().toString())) % colors.length;
+    const bg = colors[idx];
+    const initial = (s && String(s)[0]) ? String(s)[0].toUpperCase() : '?';
+    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><rect width='100%' height='100%' fill='${bg}' rx='20'/><text x='50%' y='50%' font-size='96' dy='.35em' text-anchor='middle' fill='white' font-family='Arial,Helvetica,sans-serif'>${initial}</text></svg>`;
+    return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+}
+
 /***********************
  * RENDER
  ***********************/
@@ -228,8 +248,14 @@ if (signupForm) {
                 console.warn('Avatar load failed', err);
             }
         }
+        // if no avatar uploaded, generate and persist a random one
+        if (!avatarData) {
+            avatarData = generateRandomAvatar(username || Math.random().toString(36));
+        }
+        const address = document.getElementById('suAddress') ? document.getElementById('suAddress').value.trim() : '';
         const newUser = {username, password, display};
         if (avatarData) newUser.avatar = avatarData;
+        if (address) newUser.address = address;
         users.push(newUser);
         saveUsers(users);
         localStorage.setItem(CURRENT_USER_KEY, username);
@@ -321,6 +347,8 @@ const TRANSLATIONS = {
         'settings.accountNote': 'Giriş yapmadan sadece görüntülenen ismi değiştiremezsiniz. Lütfen giriş yapın.',
         'settings.displayLabel': 'Görünen İsim',
         'settings.passwordLabel': 'Yeni Şifre (isteğe bağlı)',
+        'settings.addressLabel': 'Dükkan Adresi',
+        'settings.addressPlaceholder': 'Dükkan adresinizi girin',
         'settings.avatarLabel': 'Profil Resmi',
         'remove_avatar': 'Resmi Kaldır',
         'settings.interface': 'Arayüz',
@@ -371,6 +399,8 @@ const TRANSLATIONS = {
         'settings.accountNote': 'You must be signed in to change display name.',
         'settings.displayLabel': 'Display Name',
         'settings.passwordLabel': 'New Password (optional)',
+        'settings.addressLabel': 'Store Address',
+        'settings.addressPlaceholder': 'Enter store address',
         'settings.avatarLabel': 'Profile Image',
         'remove_avatar': 'Remove Image',
         'settings.interface': 'Interface',
@@ -420,6 +450,8 @@ const TRANSLATIONS = {
         'settings.accountNote': 'Debe iniciar sesión para cambiar el nombre visible.',
         'settings.displayLabel': 'Nombre Visible',
         'settings.passwordLabel': 'Nueva Contraseña (opcional)',
+        'settings.addressLabel': 'Dirección de la tienda',
+        'settings.addressPlaceholder': 'Introduce la dirección de la tienda',
         'settings.avatarLabel': 'Imagen de Perfil',
         'remove_avatar': 'Eliminar imagen',
         'settings.interface': 'Interfaz',
@@ -469,6 +501,8 @@ const TRANSLATIONS = {
         'settings.accountNote': 'Vous devez être connecté pour changer le nom affiché.',
         'settings.displayLabel': "Nom d'affichage",
         'settings.passwordLabel': 'Nouveau mot de passe (optionnel)',
+        'settings.addressLabel': 'Adresse du magasin',
+        'settings.addressPlaceholder': 'Entrez l\'adresse du magasin',
         'settings.avatarLabel': 'Image de profil',
         'remove_avatar': 'Supprimer l\'image',
         'settings.interface': 'Interface',
@@ -526,10 +560,21 @@ function updateAuthUI() {
     if (!authActions) return;
     const user = getCurrentUser();
     if (user) {
+        // ensure user has an avatar; if not, persist a generated one so it's stable
+        if (!user.avatar) {
+            const users = getUsers();
+            const idx = users.findIndex(u => u.username === user.username);
+            const gen = generateRandomAvatar(user.username || Math.random().toString(36));
+            if (idx !== -1) { users[idx].avatar = gen; saveUsers(users); user.avatar = gen; }
+            else { user.avatar = gen; }
+        }
         authActions.innerHTML = `
             <div style="display:flex; align-items:center; gap:10px;">
-                ${user.avatar ? `<img src="${user.avatar}" class="auth-avatar">` : ''}
-                <span>${t('greeting')} <strong>${user.display || user.username}</strong></span>
+                <img src="${user.avatar}" class="auth-avatar">
+                <div style="display:flex; flex-direction:column;">
+                    <span>${t('greeting')} <strong>${user.display || user.username}</strong></span>
+                    ${user.address ? `<small style="color:#666;">${user.address}</small>` : ''}
+                </div>
                 <button id="logoutBtn" class="btn btn-clear">${t('logout')}</button>
                 <a href="subscription.html" class="btn btn-clear">${t('nav.subs')}</a>
                 <a href="settings.html" class="btn btn-clear">${t('nav.settings')}</a>
@@ -611,9 +656,17 @@ if (globalSaveBtn) {
             if (idx !== -1) {
                 if (display) { users[idx].display = display; accountChanged = true; }
                 if (newPass) { users[idx].password = newPass; accountChanged = true; }
+                // address
+                const setAddress = document.getElementById('setAddress');
+                if (setAddress) {
+                    const newAddr = setAddress.value.trim();
+                    if (newAddr !== (users[idx].address || '')) { users[idx].address = newAddr; accountChanged = true; }
+                }
                 // handle avatar changes: remove flag or file
                 if (avatarPreview && avatarPreview.dataset && avatarPreview.dataset.remove === '1') {
-                    if (users[idx].avatar) { delete users[idx].avatar; accountChanged = true; }
+                    // instead of leaving it empty, assign a new random avatar and persist
+                    users[idx].avatar = generateRandomAvatar(users[idx].username || Math.random().toString(36));
+                    accountChanged = true;
                 } else if (avatarInput && avatarInput.files && avatarInput.files[0]) {
                     try {
                         const data = await readFileAsDataURL(avatarInput.files[0]);
