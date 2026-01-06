@@ -16,25 +16,69 @@
         </header>
 
         <main class="main-content">
-            <section class="form-section">
-                <h2>Hesap Bilgileri</h2>
-                <p>Kullanıcı: <strong id="settingsUsername">Yükleniyor...</strong></p>
+            <div class="form-row" style="gap:24px; align-items:flex-start;">
+                <aside style="width:220px;">
+                    <nav class="form-section" style="padding:16px;">
+                        <h3>Ayarlar</h3>
+                        <ul style="list-style:none; padding-left:0; margin-top:12px; display:flex; flex-direction:column; gap:8px;">
+                            <li><a href="#account">Hesap</a></li>
+                            <li><a href="#interface">Arayüz</a></li>
+                            <li><a href="#language">Dil</a></li>
+                        </ul>
+                    </nav>
+                </aside>
 
-                <form id="settingsForm">
-                    <div class="form-group">
-                        <label>Görünen İsim</label>
-                        <input type="text" id="setDisplay" placeholder="Görünen ismi girin">
-                    </div>
+                <div style="flex:1;">
+                    <section id="account" class="form-section">
+                        <h2>Hesap</h2>
+                        <p>Kullanıcı: <strong id="settingsUsername">Ziyaretçi</strong></p>
+                        <p id="accountNote" style="color:#666;">Giriş yapmadan sadece görüntülenen ismi değiştiremezsiniz. Lütfen giriş yapın.</p>
 
-                    <div class="form-group">
-                        <label>Yeni Şifre (isteğe bağlı)</label>
-                        <input type="password" id="setPassword" placeholder="Yeni şifre">
-                    </div>
+                        <form id="settingsForm">
+                            <div class="form-group">
+                                <label>Görünen İsim</label>
+                                <input type="text" id="setDisplay" placeholder="Görünen ismi girin" disabled>
+                            </div>
 
-                    <button class="btn btn-add">Kaydet</button>
-                    <a class="btn btn-clear" href="index.html">← Ana Sayfaya Dön</a>
-                </form>
-            </section>
+                            <div class="form-group">
+                                <label>Yeni Şifre (isteğe bağlı)</label>
+                                <input type="password" id="setPassword" placeholder="Yeni şifre" disabled>
+                            </div>
+
+                            <button id="saveAccount" class="btn btn-add" disabled>Kaydet</button>
+                        </form>
+                    </section>
+
+                    <section id="interface" class="form-section">
+                        <h2>Arayüz</h2>
+                        <p>Ayarlarınızı kişiselleştirin (Karanlık tema yok — siyah yapma isteğine göre açık tutuldu).</p>
+                        <div class="form-group">
+                            <label>Temayı Seç</label>
+                            <select id="uiTheme">
+                                <option value="light">Açık (varsayılan)</option>
+                                <option value="system">Sistem</option>
+                            </select>
+                        </div>
+                    </section>
+
+                    <section id="language" class="form-section">
+                        <h2>Dil</h2>
+                        <p>Uygulama dili seçiniz (yalnızca seçim kaydedilir; tam çeviri henüz yok).</p>
+                        <div class="form-group">
+                            <label>Dil Seçimi</label>
+                            <select id="uiLanguage">
+                                <option value="tr">Türkçe</option>
+                                <option value="en">English</option>
+                                <option value="es">Español</option>
+                                <option value="fr">Français</option>
+                            </select>
+                        </div>
+                        <button id="saveInterface" class="btn btn-add">Kaydet</button>
+                    </section>
+
+                    <p style="margin-top:12px;"><a class="btn btn-clear" href="index.html">← Ana Sayfaya Dön</a></p>
+                </div>
+            </div>
         </main>
 
         <footer class="footer">
@@ -47,14 +91,28 @@
         document.addEventListener('DOMContentLoaded', () => {
             if (typeof getCurrentUser !== 'function') return;
             const user = getCurrentUser();
-            if (!user) {
-                window.location.href = 'login.html';
-                return;
-            }
-            const display = document.getElementById('setDisplay');
             const username = document.getElementById('settingsUsername');
-            if (username) username.textContent = user.username;
-            if (display) display.value = user.display || user.username;
+            const display = document.getElementById('setDisplay');
+            const pass = document.getElementById('setPassword');
+            const saveAccount = document.getElementById('saveAccount');
+            const accountNote = document.getElementById('accountNote');
+            if (user) {
+                if (username) username.textContent = user.username;
+                if (display) { display.value = user.display || user.username; display.disabled = false; }
+                if (pass) pass.disabled = false;
+                if (saveAccount) saveAccount.disabled = false;
+                if (accountNote) accountNote.style.display = 'none';
+            } else {
+                if (username) username.textContent = 'Ziyaretçi';
+                if (accountNote) accountNote.style.display = 'block';
+            }
+
+            // load saved interface settings
+            const saved = JSON.parse(localStorage.getItem('dukkan_settings') || '{}');
+            const lang = document.getElementById('uiLanguage');
+            const theme = document.getElementById('uiTheme');
+            if (lang && saved.language) lang.value = saved.language;
+            if (theme && saved.theme) theme.value = saved.theme;
         });
     </script>
 </body>
