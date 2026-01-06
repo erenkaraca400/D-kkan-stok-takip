@@ -536,19 +536,47 @@ if (saveAccountBtn) {
     });
 }
 
-// Interface / Language saves
-const saveInterfaceBtn = document.getElementById('saveInterface');
-if (saveInterfaceBtn) {
-    saveInterfaceBtn.addEventListener('click', (e) => {
+// Global save button (saves interface + account if available)
+const globalSaveBtn = document.getElementById('globalSave');
+if (globalSaveBtn) {
+    globalSaveBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        const lang = document.getElementById('uiLanguage').value;
-        const theme = document.getElementById('uiTheme').value;
+        // save interface/language
+        const langEl = document.getElementById('uiLanguage');
+        const themeEl = document.getElementById('uiTheme');
+        const lang = langEl ? langEl.value : (JSON.parse(localStorage.getItem('dukkan_settings')||'{}').language || 'tr');
+        const theme = themeEl ? themeEl.value : (JSON.parse(localStorage.getItem('dukkan_settings')||'{}').theme || 'light');
         const settings = { language: lang, theme };
         localStorage.setItem('dukkan_settings', JSON.stringify(settings));
         applyTranslations();
         applyTheme();
         updateAuthUI();
-        alert(t('settings_saved'));
+
+        // attempt to save account changes if user is logged in
+        const user = getCurrentUser();
+        let accountChanged = false;
+        if (user) {
+            const displayEl = document.getElementById('setDisplay');
+            const passEl = document.getElementById('setPassword');
+            const display = displayEl ? displayEl.value.trim() : '';
+            const newPass = passEl ? passEl.value : '';
+            const users = getUsers();
+            const idx = users.findIndex(u => u.username === user.username);
+            if (idx !== -1) {
+                if (display) { users[idx].display = display; accountChanged = true; }
+                if (newPass) { users[idx].password = newPass; accountChanged = true; }
+                if (accountChanged) {
+                    saveUsers(users);
+                    // clear password field after saving
+                    if (passEl) passEl.value = '';
+                    updateAuthUI();
+                }
+            }
+        }
+
+        // final notification
+        if (accountChanged) alert(t('account_saved'));
+        else alert(t('settings_saved'));
     });
 }
 

@@ -91,7 +91,19 @@ aside nav ul li a:hover {
 @media (max-width: 800px) {
     aside { width: 100%; }
     .form-row { flex-direction: column; }
+    .global-save { position: fixed !important; bottom: 14px !important; right: 14px !important; }
 }
+
+/* Global save button in settings */
+.global-save {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 30;
+    padding: 10px 14px;
+    border-radius: 10px;
+}
+
 
 /* MAIN */
 .main-content {
